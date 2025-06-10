@@ -20,12 +20,13 @@ O **Next_Page** é um editor de documentos on-line colaborativo que integra, de 
 > Nesta seção, adicione as dependências e frameworks utilizados, por exemplo:  
 > - Frontend:  `React` + `TypeScript`  
 > - Editor de Texto:   
-> - Backend: 
+> - Backend: `Python` + `FastAPI`
 > - Banco de Dados: 
 > - Comunicação em Tempo Real:
 > - Controle de Versão Interno:   
 
 ## Pré-requisitos
+- [ ] Python 3.11 ou superior
 - [ ] Node.js (versão X.X.X ou superior)  
 
 ## Como Executar
