@@ -27,15 +27,15 @@ function Login() {
   return (
     <div className="bg-slate-100" style={{ fontFamily: 'Manrope, \"Noto Sans\", sans-serif' }}>
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-        <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-2xl">
+        <div className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl rounded-xl bg-white p-8 lg:p-12 shadow-2xl">
           <div className="mb-8 flex flex-col items-center">
             <div className="mb-4 flex items-center gap-3 text-slate-800">
               <svg className="h-10 w-10 text-[#0c7ff2]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                 <path d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z" fill="currentColor"></path>
               </svg>
-              <h1 className="text-3xl font-bold tracking-tight">CodeCollab</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">CodeCollab</h1>
             </div>
-            <p className="text-slate-600">Welcome back! Please sign in to your account.</p>
+            <p className="text-slate-600 text-base sm:text-lg">Welcome back! Please sign in to your account.</p>
           </div>
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
@@ -90,7 +90,7 @@ function Login() {
               </div>
             )}
             <div>
-              <button type="submit" className="flex w-full justify-center rounded-lg bg-[#0c7ff2] py-3 px-4 text-sm font-semibold text-white shadow-sm hover:bg-[#0a68c4] focus:outline-none focus:ring-2 focus:ring-[#0c7ff2] focus:ring-offset-2 transition-colors duration-150">
+              <button type="submit" className="flex w-full justify-center rounded-lg bg-[#0c7ff2] py-3 px-4 lg:py-4 lg:px-6 text-sm lg:text-base font-semibold text-white shadow-sm hover:bg-[#0a68c4] focus:outline-none focus:ring-2 focus:ring-[#0c7ff2] focus:ring-offset-2 transition-colors duration-150">
                 Sign in
               </button>
             </div>
