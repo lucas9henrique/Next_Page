@@ -1,0 +1,113 @@
+<html><head>
+    <meta charset="utf-8"/>
+    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+    <link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Manrope%3Awght%40400%3B500%3B700%3B800&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet"/>
+    <title>CodeCollab - Login</title>
+    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style>
+        .error-message {
+          animation: shake 0.5s;
+        }
+        @keyframes shake {
+          0% {
+            transform: translateX(0);
+          }
+          25% {
+            transform: translateX(-5px);
+          }
+          50% {
+            transform: translateX(5px);
+          }
+          75% {
+            transform: translateX(-5px);
+          }
+          100% {
+            transform: translateX(0);
+          }
+        }
+      </style>
+    </head>
+    <body class="bg-slate-100" style='font-family: Manrope, "Noto Sans", sans-serif;'>
+    <div class="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800 p-6">
+    <div class="w-full max-w-md rounded-xl bg-white p-8 shadow-2xl">
+    <div class="mb-8 flex flex-col items-center">
+    <div class="mb-4 flex items-center gap-3 text-slate-800">
+    <svg class="h-10 w-10 text-[#0c7ff2]" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+    <path d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z" fill="currentColor"></path>
+    </svg>
+    <h1 class="text-3xl font-bold tracking-tight">CodeCollab</h1>
+    </div>
+    <p class="text-slate-600">Welcome back! Please sign in to your account.</p>
+    </div>
+    <form class="space-y-6">
+    <div>
+    <label class="block text-sm font-medium text-slate-700" for="email">Email address</label>
+    <div class="mt-1">
+    <input autocomplete="email" class="form-input block w-full rounded-lg border-slate-300 py-3 px-4 shadow-sm placeholder:text-slate-400 focus:border-[#0c7ff2] focus:ring-[#0c7ff2] sm:text-sm" id="email" name="email" placeholder="you@example.com" required="" type="email"/>
+    </div>
+    </div>
+    <div>
+    <div class="flex items-center justify-between">
+    <label class="block text-sm font-medium text-slate-700" for="password">Password</label>
+    <div class="text-sm">
+    <a class="font-medium text-[#0c7ff2] hover:text-[#0a68c4]" href="#">Forgot your password?</a>
+    </div>
+    </div>
+    <div class="mt-1">
+    <input autocomplete="current-password" class="form-input block w-full rounded-lg border-slate-300 py-3 px-4 shadow-sm placeholder:text-slate-400 focus:border-[#0c7ff2] focus:ring-[#0c7ff2] sm:text-sm" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+    </div>
+    </div>
+    <div class="hidden rounded-md bg-red-50 p-4 error-message" id="errorMessage">
+    <div class="flex">
+    <div class="flex-shrink-0">
+    <svg aria-hidden="true" class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+    <path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-10a1 1 0 10-2 0v4a1 1 0 102 0V8zm-1 7a1 1 0 100-2 1 1 0 000 2z" fill-rule="evenodd"></path>
+    </svg>
+    </div>
+    <div class="ml-3">
+    <p class="text-sm font-medium text-red-800">Invalid email or password. Please try again.</p>
+    </div>
+    </div>
+    </div>
+    <div>
+    <button class="flex w-full justify-center rounded-lg bg-[#0c7ff2] py-3 px-4 text-sm font-semibold text-white shadow-sm hover:bg-[#0a68c4] focus:outline-none focus:ring-2 focus:ring-[#0c7ff2] focus:ring-offset-2 transition-colors duration-150" type="submit">
+                Sign in
+              </button>
+    </div>
+    </form>
+    <p class="mt-8 text-center text-sm text-slate-600">
+            New to CodeCollab?
+            <a class="font-medium text-[#0c7ff2] hover:text-[#0a68c4]" href="#">Create an account</a>
+    </p>
+    </div>
+    <footer class="mt-10 text-center text-sm text-slate-400">
+    <p>© 2024 CodeCollab. All rights reserved.</p>
+    <div class="mt-2">
+    <a class="hover:text-slate-200" href="#">Privacy Policy</a>
+    <span class="mx-2">|</span>
+    <a class="hover:text-slate-200" href="#">Terms of Service</a>
+    </div>
+    </footer>
+    </div>
+    <script>
+        const form = document.querySelector('form');
+        const errorMessageDiv = document.getElementById('errorMessage');
+        form.addEventListener('submit', function(event) {
+          event.preventDefault(); // Prevent actual submission for demo
+          // Simulate a login failure
+          const email = document.getElementById('email').value;
+          const password = document.getElementById('password').value;
+          if (email !== 'user@example.com' || password !== 'password123') { // Dummy credentials
+            errorMessageDiv.classList.remove('hidden');
+             // Trigger reflow to restart animation
+            errorMessageDiv.style.animation = 'none';
+            errorMessageDiv.offsetHeight;errorMessageDiv.style.animation = null;
+          } else {
+            errorMessageDiv.classList.add('hidden');
+            alert('Login successful (demo)!'); // Replace with actual login logic
+          }
+        });
+      </script>
+    
+    </body></html>
