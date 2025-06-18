@@ -27,7 +27,7 @@ function Login() {
 
   return (
     <div className="bg-slate-100" style={{ fontFamily: 'Manrope, \"Noto Sans\", sans-serif' }}>
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[#625DF5] from-slate-900 to-slate-800 p-6">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#625DF5] to-transparent p-6">
         <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-2xl">
           <div className="mb-8 flex flex-col items-center">
             <div className="mb-4 flex items-center gap-3 text-slate-800">
@@ -99,7 +99,7 @@ function Login() {
             <a className="font-medium text-[#0c7ff2] hover:text-[#0a68c4]" href="#"> Create an account</a>
           </p>
         </div>
-        <footer className="mt-10 text-white text-center text-sm text-slate-400">
+        <footer className="mt-10 text-black-600 text-center text-sm text-slate-400">
           <p>© 2025 Next_Page. All rights reserved.</p>
           <div className="mt-2">
           </div>
