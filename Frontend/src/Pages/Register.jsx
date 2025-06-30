@@ -1,12 +1,14 @@
 import { useState, useRef } from 'react'
 import './Login.css'
 import logo from '../assets/logo1.png'
+import { Link, useNavigate } from 'react-dom'
 
-function Register({ onShowLogin }) {
+function Register() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const errorRef = useRef(null)
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -28,7 +30,7 @@ function Register({ onShowLogin }) {
       } else {
         setError('')
         alert('Registration successful!')
-        onShowLogin()
+        navigate('/')
       }
     } catch (err) {
       setError('Network error')
@@ -101,7 +103,7 @@ function Register({ onShowLogin }) {
           </form>
           <p className="mt-8 text-center text-sm text-slate-600">
             Already have an account?
-            <a className="font-medium text-[#0c7ff2] hover:text-[#0a68c4]" href="#" onClick={onShowLogin}> Sign in</a>
+            <Link className="font-medium text-[#0c7ff2] hover:text-[#0a68c4]" to="/"> Sign in</Link>
           </p>
         </div>
         <footer className="mt-10 text-black-600 text-center text-sm text-slate-400">
