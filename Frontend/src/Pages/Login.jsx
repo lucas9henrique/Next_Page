@@ -56,7 +56,7 @@ function Login({ onShowRegister }) {
                   autoComplete="email"
                   required
                   placeholder="you@example.com"
-                  className="form-input block w-full rounded-lg border-slate-300 py-3 px-4 shadow-sm placeholder:text-slate-400 focus:border-[#0c7ff2] focus:ring-[#0c7ff2] sm:text-sm"
+                  className="form-input text-black block w-full rounded-lg border-slate-300 py-3 px-4 shadow-sm placeholder:text-slate-400 focus:border-[#0c7ff2] focus:ring-[#0c7ff2] sm:text-sm"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -77,7 +77,7 @@ function Login({ onShowRegister }) {
                   autoComplete="current-password"
                   required
                   placeholder="••••••••"
-                  className="form-input block w-full rounded-lg border-slate-300 py-3 px-4 shadow-sm placeholder:text-slate-400 focus:border-[#0c7ff2] focus:ring-[#0c7ff2] sm:text-sm"
+                  className="form-input text-black block w-full rounded-lg border-slate-300 py-3 px-4 shadow-sm placeholder:text-slate-400 focus:border-[#0c7ff2] focus:ring-[#0c7ff2] sm:text-sm"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
