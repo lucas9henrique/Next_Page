@@ -29,18 +29,18 @@ O **Next_Page** é um editor de documentos on-line colaborativo que integra, de 
 - [ ] Node.js (versão X.X.X ou superior)  
 
 ## Como Executar
-# 1. Clone e vá para o diretório
+### 1. Clone e vá para o diretório
 git clone https://github.com/SEU_USUARIO/next_page.git
 cd next_page
 
-# (opcional) ative um virtualenv:
-# python -m venv venv
-# source venv/bin/activate
+### (opcional) ative um virtualenv:
+#### python -m venv venv
+#### source venv/bin/activate
 
-# 2. Backend: instale dependências Python
+### 2. Backend: instale dependências Python
 pip install -r requirements.txt
 
-# 3. Frontend: instale e execute
+### 3. Frontend: instale e execute
 cd Frontend
 npm install
 npm install --save-dev vite
