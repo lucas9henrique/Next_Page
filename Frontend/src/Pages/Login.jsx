@@ -1,12 +1,14 @@
 import { useState, useRef } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import './Login.css'
 import logo from '../assets/logo1.png'
 
-function Login({ onShowRegister }) {
+function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const errorRef = useRef(null)
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -27,7 +29,7 @@ function Login({ onShowRegister }) {
         }
       } else {
         setError('')
-        alert('Login successful!')
+        navigate('/editor')
       }
     } catch (err) {
       setError('Network error')
@@ -105,7 +107,7 @@ function Login({ onShowRegister }) {
           </form>
           <p className="mt-8 text-center text-sm text-slate-600">
             New to Next_Page?
-            <a className="font-medium text-[#0c7ff2] hover:text-[#0a68c4]" href="#" onClick={onShowRegister}> Create an account</a>
+            <Link className="font-medium text-[#0c7ff2] hover:text-[#0a68c4]" to="/register"> Create an account</Link>
           </p>
         </div>
         <footer className="mt-10 text-black-600 text-center text-sm text-slate-400">

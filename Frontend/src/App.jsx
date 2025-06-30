@@ -1,13 +1,15 @@
-import { useState } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Login from './Pages/Login.jsx'
 import Register from './Pages/Register.jsx'
-
+import Editor from './Pages/Editor.jsx'
 function App() {
-  const [page, setPage] = useState('login')
-  return page === 'login' ? (
-    <Login onShowRegister={() => setPage('register')} />
-  ) : (
-    <Register onShowLogin={() => setPage('login')} />
+  return (
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/editor" element={<Editor />} />
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
   )
 }
 
