@@ -41,8 +41,8 @@ cd next_page
 pip install -r requirements.txt
 
 ### 3. Frontend: instale e execute
-cd Frontend
-npm install
-npm install --save-dev vite
-npm run dev
-
+- cd Frontend
+- npm install
+- npm install --save-dev vite
+- npm run dev
+- npm install react-router-dom
