@@ -1,6 +1,19 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
+import HorizontalRule from '@tiptap/extension-horizontal-rule'
+
+const PageBreak = HorizontalRule.extend({
+  name: 'pageBreak',
+  addKeyboardShortcuts() {
+    return {
+      'Mod-Enter': () => this.editor.commands.setHorizontalRule(),
+    }
+  },
+  renderHTML({ HTMLAttributes }) {
+    return ['hr', { ...HTMLAttributes, class: 'page-break' }]
+  },
+})
 
 function Editor() {
   const pageStyle = { fontFamily: 'Manrope, "Noto Sans", sans-serif' }
@@ -12,6 +25,7 @@ function Editor() {
       Placeholder.configure({
         placeholder: 'Start typing your document here...'
       }),
+      PageBreak,
     ],
     content: '',
   })
@@ -80,11 +94,13 @@ function Editor() {
                   <span>Saved</span>
                 </div>
               </div>
-              <div className="p-1">
-                <EditorContent
-                  editor={editor}
-                  className="form-textarea w-full resize-none overflow-hidden rounded-md text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent border-transparent bg-white min-h-[calc(100vh-200px)] p-6 text-base font-normal leading-relaxed"
-                />
+              <div className="p-1 flex justify-center">
+                <div className="editor-page">
+                  <EditorContent
+                    editor={editor}
+                    className="w-full h-full outline-none"
+                  />
+                </div>
               </div>
             </div>
           </div>

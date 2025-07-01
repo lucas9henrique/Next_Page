@@ -64,3 +64,17 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.editor-page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 20px auto;
+  padding: 20mm 25mm;
+  background: white;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.page-break {
+  border: 1px dashed #bbb;
+  margin: 32px 0;
+}
