@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import './Login.css'
 import logo from '../assets/logo1.png'
-import { Link, useNavigate } from 'react-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 function Login() {
   const [email, setEmail] = useState('')
