@@ -67,11 +67,13 @@ button:focus-visible {
 
 .editor-page {
   width: 210mm;
-  min-height: 297mm;
+  height: 297mm;
   margin: 20px auto;
   padding: 20mm 25mm;
   background: white;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  color: #000;
 }
 
 .page-break {
