@@ -1,19 +1,7 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import CharacterCount from '@tiptap/extension-character-count';
 import Placeholder from '@tiptap/extension-placeholder'
-import HorizontalRule from '@tiptap/extension-horizontal-rule'
-
-const PageBreak = HorizontalRule.extend({
-  name: 'pageBreak',
-  addKeyboardShortcuts() {
-    return {
-      'Mod-Enter': () => this.editor.commands.setHorizontalRule(),
-    }
-  },
-  renderHTML({ HTMLAttributes }) {
-    return ['hr', { ...HTMLAttributes, class: 'page-break' }]
-  },
-})
 
 function Editor() {
   const pageStyle = { fontFamily: 'Manrope, "Noto Sans", sans-serif' }
@@ -22,12 +10,15 @@ function Editor() {
   const editor = useEditor({
     extensions: [
       StarterKit,
+      CharacterCount.configure({
+        limit: 2600,   // bloqueia input, inclusive colar
+        mode: 'nodeSize',   // usa o contador padrão
+      }),
       Placeholder.configure({
         placeholder: 'Start typing your document here...'
       }),
-      PageBreak,
     ],
-    content: '',
+    content: '' 
   })
   return (
     <div className="relative flex size-full min-h-screen flex-col bg-slate-100 group/design-root overflow-x-hidden" style={pageStyle}>
