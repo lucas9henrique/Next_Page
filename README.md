@@ -48,3 +48,10 @@ cd next_page
 - npm install react-router-dom
 - npm run dev
 
+## Novas rotas da API
+Com o backend rodando em `http://localhost:8000`, as seguintes rotas permitem
+persistir documentos simples em um repositório Git para cada usuário:
+
+- `POST /api/save` salva o conteúdo enviado e cria um commit.
+- `GET /api/history/{email}` retorna a lista de commits do usuário.
+

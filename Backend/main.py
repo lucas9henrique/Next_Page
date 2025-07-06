@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import uuid
+from git import Repo
 
 app = FastAPI()
 
@@ -18,6 +19,8 @@ app.add_middleware(
 )
 
 USERS_FILE = os.path.join(os.path.dirname(__file__), "users.json")
+REPOS_ROOT = os.path.join(os.path.dirname(__file__), "repos")
+os.makedirs(REPOS_ROOT, exist_ok=True)
 
 
 def load_users():
@@ -42,6 +45,12 @@ def hash_password(password: str, salt: str) -> str:
 class UserCredentials(BaseModel):
     email: str
     password: str
+
+
+class DocumentData(BaseModel):
+    email: str
+    content: str
+    message: str | None = None
 
 
 @app.get("/api/hello")
@@ -70,3 +79,35 @@ def login(creds: UserCredentials):
     if hash_password(creds.password, user["salt"]) != user["password"]:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     return {"msg": "Login successful"}
+
+
+@app.post("/api/save")
+def save_document(data: DocumentData):
+    repo_path = os.path.join(REPOS_ROOT, data.email)
+    if not os.path.exists(repo_path):
+        os.makedirs(repo_path, exist_ok=True)
+        repo = Repo.init(repo_path)
+    else:
+        repo = Repo(repo_path)
+    doc_file = os.path.join(repo_path, "document.txt")
+    with open(doc_file, "w", encoding="utf-8") as f:
+        f.write(data.content)
+    repo.index.add(["document.txt"])
+    repo.index.commit(data.message or "Update")
+    return {"msg": "Document saved"}
+
+
+@app.get("/api/history/{email}")
+def commit_history(email: str):
+    repo_path = os.path.join(REPOS_ROOT, email)
+    if not os.path.exists(repo_path):
+        raise HTTPException(status_code=404, detail="No repository found")
+    repo = Repo(repo_path)
+    commits = [
+        {
+            "message": c.message.strip(),
+            "timestamp": c.committed_datetime.isoformat(),
+        }
+        for c in repo.iter_commits()
+    ]
+    return commits
