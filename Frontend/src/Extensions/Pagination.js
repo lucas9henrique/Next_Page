@@ -21,8 +21,9 @@ export const Pagination = Extension.create({
         view: view => {
           const check = () => {
             const docHeight = view.dom.scrollHeight
-            const breaks = countBreaks(view.state.doc)
-            if (docHeight > pageHeight * (breaks + 1)) {
+            const expectedBreaks = Math.floor(docHeight / pageHeight)
+            const currentBreaks = countBreaks(view.state.doc)
+            if (expectedBreaks > currentBreaks) {
               const tr = view.state.tr.insert(view.state.doc.content.size, view.state.schema.nodes.pageBreak.create())
               view.dispatch(tr)
             }

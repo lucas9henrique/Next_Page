@@ -67,11 +67,10 @@ button:focus-visible {
 
 .editor-page {
   width: 210mm;
-  height: 297mm;
+  min-height: 297mm;
   margin: 20px auto;
   padding: 20mm 25mm;
   background: white;
-  overflow: hidden;
   color: #000;
 }
 
@@ -79,19 +78,18 @@ button:focus-visible {
   outline: none; /* remove contorno preto */
   box-sizing: border-box;
   max-width: 100%;
-  max-height: 100%;
   overflow-wrap: break-word;
   word-break: break-word;
 }
 
 .editor-page .ProseMirror {
   width: 210mm;
-  height: 297mm;
-  overflow-y: hidden;
+  min-height: 297mm;
 }
 
 .page-break {
   border-top: 1px dashed #bbb;
   margin: 32px 0;
   width: 100%;
+  page-break-after: always;
 }

@@ -16,7 +16,7 @@ O **Next_Page** é um editor de documentos on-line colaborativo que integra, de 
 - **Resolução de Conflitos**
   Interface para identificar e mesclar trechos conflitantes.
 - **Paginação Automática**
-  Novas páginas A4 são criadas conforme o conteúdo excede o espaço disponível.
+  Páginas adicionais no formato A4 aparecem automaticamente quando o texto ultrapassa o limite da página atual, assim como em editores tradicionais.
 
 ## Tecnologias (a definir)
 > Nesta seção, adicione as dependências e frameworks utilizados, por exemplo:  
