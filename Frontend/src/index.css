@@ -91,6 +91,7 @@ button:focus-visible {
 }
 
 .page-break {
-  border: 1px dashed #bbb;
+  border-top: 1px dashed #bbb;
   margin: 32px 0;
+  width: 100%;
 }

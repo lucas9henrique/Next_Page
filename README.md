@@ -13,8 +13,10 @@ O **Next_Page** é um editor de documentos on-line colaborativo que integra, de 
 - **Histórico de Alterações**  
   Visualize todas as mudanças realizadas, com autor, timestamp e mensagem de commit.
 
-- **Resolução de Conflitos**  
+- **Resolução de Conflitos**
   Interface para identificar e mesclar trechos conflitantes.
+- **Paginação Automática**
+  Novas páginas A4 são criadas conforme o conteúdo excede o espaço disponível.
 
 ## Tecnologias (a definir)
 > Nesta seção, adicione as dependências e frameworks utilizados, por exemplo:  

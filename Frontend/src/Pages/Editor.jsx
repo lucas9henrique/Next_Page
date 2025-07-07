@@ -1,7 +1,9 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import CharacterCount from '@tiptap/extension-character-count';
+import CharacterCount from '@tiptap/extension-character-count'
 import Placeholder from '@tiptap/extension-placeholder'
+import { PageBreak } from '../Extensions/PageBreak'
+import { Pagination } from '../Extensions/Pagination'
 
 function Editor() {
   const pageStyle = { fontFamily: 'Manrope, "Noto Sans", sans-serif' }
@@ -10,6 +12,8 @@ function Editor() {
   const editor = useEditor({
     extensions: [
       StarterKit,
+      PageBreak,
+      Pagination,
       CharacterCount.configure({
         limit: 2600,   // bloqueia input, inclusive colar
         mode: 'nodeSize',   // usa o contador padrão
