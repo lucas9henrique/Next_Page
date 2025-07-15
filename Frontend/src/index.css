@@ -72,3 +72,17 @@ div.body {
   max-width: 100% !important;
   box-sizing: border-box;
 }
+
+div.page{
+  height: 240mm !important; 
+}
+
+.ProseMirror:focus {
+  outline: none !important;
+}
+
+/* override page spacing from the pagination plugin */
+.page {
+  margin: 24px auto !important;
+  padding: 0 !important;
+}
