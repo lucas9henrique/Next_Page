@@ -65,6 +65,10 @@ button:focus-visible {
   }
 }
 
-.editor-page {
-  color: #000;
+div.body {
+  margin: 0 auto !important;      /* centraliza horizontalmente */
+  padding: 0 !important;
+  width: 100% !important;         /* ocupa toda a largura disponível */
+  max-width: 100% !important;
+  box-sizing: border-box;
 }

@@ -76,8 +76,8 @@ function Editor({ content, setContent, editable = true }) {
         </header>
 
 
-        <main className="flex flex-1 justify-center py-8 px-4 sm:px-6 lg:px-8">
-          <div className="w-full max-w-4xl">
+        <main className="flex flex-1 p-0">
+          <div className="w-full">
             <div className="bg-white shadow-xl rounded-lg overflow-hidden">
               <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-2 bg-slate-50">
                 <div className="flex items-center gap-1">
@@ -106,10 +106,7 @@ function Editor({ content, setContent, editable = true }) {
                   <span>Saved</span>
                 </div>
               </div>
-               
-                  <EditorContent
-                    editor={editor}/>
-                
+              <EditorContent editor={editor} className="w-full h-full outline-none text-black"/>
             </div>
           </div>
         </main>
