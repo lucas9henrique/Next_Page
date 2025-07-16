@@ -26,6 +26,7 @@ function Editor({ content, setContent, editable = true }) {
     HeaderFooterNode,
     BodyNode,
   ];
+const editor = useEditor({
     extensions,
     content,
     editable,
