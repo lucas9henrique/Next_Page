@@ -1,6 +1,7 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import PropTypes from 'prop-types';
 import StarterKit from '@tiptap/starter-kit'
+import Underline from './Underline'
 import PaginationExtension, { PageNode, HeaderFooterNode, BodyNode } from "tiptap-extension-pagination";
 
 const pageStyle = { fontFamily: 'Manrope, "Noto Sans", sans-serif' };
@@ -13,6 +14,7 @@ function Editor({ content, setContent, editable = true }) {
   /* extensões que o Tiptap deve carregar */
   const extensions = [
     StarterKit,
+    Underline,
     PaginationExtension.configure({
       pageAmendmentOptions: {
         enableHeader: false,
@@ -61,13 +63,22 @@ function Editor({ content, setContent, editable = true }) {
               <a className="hover:text-blue-600 transition-colors" href="#">Tools</a>
             </nav>
             <div className="flex items-center gap-2">
-              <button className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors">
+              <button
+                onClick={() => editor && editor.commands.undo()}
+                className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
+              >
                 <span className="material-icons text-xl">undo</span>
               </button>
-              <button className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors">
+              <button
+                onClick={() => editor && editor.commands.redo()}
+                className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
+              >
                 <span className="material-icons text-xl">redo</span>
               </button>
-              <button className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors">
+              <button
+                onClick={() => editor && console.log(editor.getHTML())}
+                className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
+              >
                 <span className="material-icons text-xl">save</span>
               </button>
             </div>
@@ -81,24 +92,42 @@ function Editor({ content, setContent, editable = true }) {
             <div className="bg-white shadow-xl rounded-lg overflow-hidden">
               <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-2 bg-slate-50">
                 <div className="flex items-center gap-1">
-                  <button className="p-2 rounded-md text-slate-600 hover:bg-slate-200 hover:text-slate-800 transition-colors">
-                    <span className="material-icons text-xl">format_bold</span>
+                  <button
+                    onClick={() => editor && editor.chain().focus().toggleBold().run()}
+                    className={`p-2 rounded-md ${editor?.isActive('bold') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
+                  >
+                    <span className="font-bold">B</span>
                   </button>
-                  <button className="p-2 rounded-md text-slate-600 hover:bg-slate-200 hover:text-slate-800 transition-colors">
-                    <span className="material-icons text-xl">format_italic</span>
+                  <button
+                    onClick={() => editor && editor.chain().focus().toggleItalic().run()}
+                    className={`p-2 rounded-md ${editor?.isActive('italic') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
+                  >
+                    <span className="italic">I</span>
                   </button>
-                  <button className="p-2 rounded-md text-slate-600 hover:bg-slate-200 hover:text-slate-800 transition-colors">
-                    <span className="material-icons text-xl">format_underlined</span>
+                  <button
+                    onClick={() => editor && editor.chain().focus().toggleUnderline().run()}
+                    className={`p-2 rounded-md ${editor?.isActive('underline') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
+                  >
+                    <span className="underline">U</span>
                   </button>
                   <div className="h-5 w-px bg-slate-300 mx-1"></div>
-                  <button className="p-2 rounded-md text-slate-600 hover:bg-slate-200 hover:text-slate-800 transition-colors">
-                    <span className="material-icons text-xl">format_size</span>
+                  <button
+                    onClick={() => editor && editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                    className={`p-2 rounded-md ${editor?.isActive('heading', { level: 2 }) ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
+                  >
+                    <span className="font-bold">H2</span>
                   </button>
-                  <button className="p-2 rounded-md text-slate-600 hover:bg-slate-200 hover:text-slate-800 transition-colors">
-                    <span className="material-icons text-xl">format_list_bulleted</span>
+                  <button
+                    onClick={() => editor && editor.chain().focus().toggleBulletList().run()}
+                    className={`p-2 rounded-md ${editor?.isActive('bulletList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
+                  >
+                    <span>&bull;</span>
                   </button>
-                  <button className="p-2 rounded-md text-slate-600 hover:bg-slate-200 hover:text-slate-800 transition-colors">
-                    <span className="material-icons text-xl">format_list_numbered</span>
+                  <button
+                    onClick={() => editor && editor.chain().focus().toggleOrderedList().run()}
+                    className={`p-2 rounded-md ${editor?.isActive('orderedList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
+                  >
+                    <span>1.</span>
                   </button>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-500">
