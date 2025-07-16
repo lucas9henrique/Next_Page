@@ -6,20 +6,6 @@ import Placeholder from '@tiptap/extension-placeholder'
 function Editor() {
   const pageStyle = { fontFamily: 'Manrope, "Noto Sans", sans-serif' }
   const avatarStyle = { backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDm3TJQ2bsuTFWymc2Zk_ul_UFNWm9sNykIz-NMHhL0PoS12Fi486mWOZAn3_x22WDH8S0e4rhwVEmLCTpnn9njxyHcw1I_XeGkUReoLJH4uU6tSBqiAHt9mt0NycVBgx6EjInl8KMxpeLk83j0Y_FpT2REm6zfpNrhd_kVJvxKm2NU8HqgCSs0y84v--Shy1_kE_ZEqg1e8a22HZDG4b8vqbjg12BnuFRUk1gaNbl5ySWLhWKtgGNSnf6NVQhfHyjeDroohmI8BH5_")' }
-
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      CharacterCount.configure({
-        limit: 2600,   // bloqueia input, inclusive colar
-        mode: 'nodeSize',   // usa o contador padrão
-      }),
-      Placeholder.configure({
-        placeholder: 'Start typing your document here...'
-      }),
-    ],
-    content: '' 
-  })
   return (
     <div className="relative flex size-full min-h-screen flex-col bg-slate-100 group/design-root overflow-x-hidden" style={pageStyle}>
       <div className="layout-container flex h-full grow flex-col">
