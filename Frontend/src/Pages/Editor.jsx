@@ -1,11 +1,45 @@
 import { useEditor, EditorContent } from '@tiptap/react'
+import PropTypes from 'prop-types';
 import StarterKit from '@tiptap/starter-kit'
-import CharacterCount from '@tiptap/extension-character-count';
-import Placeholder from '@tiptap/extension-placeholder'
+import Underline from './Underline'
+import PaginationExtension, { PageNode, HeaderFooterNode, BodyNode } from "tiptap-extension-pagination";
 
-function Editor() {
-  const pageStyle = { fontFamily: 'Manrope, "Noto Sans", sans-serif' }
-  const avatarStyle = { backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDm3TJQ2bsuTFWymc2Zk_ul_UFNWm9sNykIz-NMHhL0PoS12Fi486mWOZAn3_x22WDH8S0e4rhwVEmLCTpnn9njxyHcw1I_XeGkUReoLJH4uU6tSBqiAHt9mt0NycVBgx6EjInl8KMxpeLk83j0Y_FpT2REm6zfpNrhd_kVJvxKm2NU8HqgCSs0y84v--Shy1_kE_ZEqg1e8a22HZDG4b8vqbjg12BnuFRUk1gaNbl5ySWLhWKtgGNSnf6NVQhfHyjeDroohmI8BH5_")' }
+const pageStyle = { fontFamily: 'Manrope, "Noto Sans", sans-serif' };
+const avatarStyle = {
+  backgroundImage:
+    'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDm3TJQ2bsuTFWymc2Zk_ul_UFNWm9sNykIz-NMHhL0PoS12Fi486mWOZAn3_x22WDH8S0e4rhwVEmLCTpnn9njxyHcw1I_XeGkUReoLJH4uU6tSBqiAHt9mt0NycVBgx6EjInl8KMxpeLk83j0Y_FpT2REm6zfpNrhd_kVJvxKm2NU8HqgCSs0y84v--Shy1_kE_ZEqg1e8a22HZDG4b8vqbjg12BnuFRUk1gaNbl5ySWLhWKtgGNSnf6NVQhfHyjeDroohmI8BH5_")',
+};
+
+function Editor({ content, setContent, editable = true }) {
+  /* extensões que o Tiptap deve carregar */
+  const extensions = [
+    StarterKit,
+    Underline,
+    PaginationExtension.configure({
+      pageAmendmentOptions: {
+        enableHeader: false,
+        enableFooter: false,
+    },
+    BorderConfig:{ top: 0, right: 0, bottom: 0, left: 0 },
+    }),
+    PageNode,
+    HeaderFooterNode,
+    BodyNode,
+  ];
+
+  /* instância do editor */
+  const editor = useEditor({
+    extensions,
+    content,
+    editable,
+    onUpdate({ editor }) {
+      setContent(editor.getHTML());          // devolve o HTML atualizado
+    },
+    onSelectionUpdate({ editor }) {
+      const { $from, $to } = editor.state.selection;
+      console.log('Selection updated:', $from.pos, $to.pos);
+    },
+  });
   return (
     <div className="relative flex size-full min-h-screen flex-col bg-slate-100 group/design-root overflow-x-hidden" style={pageStyle}>
       <div className="layout-container flex h-full grow flex-col">
@@ -28,42 +62,71 @@ function Editor() {
               <a className="hover:text-blue-600 transition-colors" href="#">Tools</a>
             </nav>
             <div className="flex items-center gap-2">
-              <button className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors">
+              <button
+                onClick={() => editor && editor.commands.undo()}
+                className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
+              >
                 <span className="material-icons text-xl">undo</span>
               </button>
-              <button className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors">
+              <button
+                onClick={() => editor && editor.commands.redo()}
+                className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
+              >
                 <span className="material-icons text-xl">redo</span>
               </button>
-              <button className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors">
+              <button
+                onClick={() => editor && console.log(editor.getHTML())}
+                className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
+              >
                 <span className="material-icons text-xl">save</span>
               </button>
             </div>
             <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9 border-2 border-white shadow-sm" style={avatarStyle}></div>
           </div>
         </header>
-        <main className="flex flex-1 justify-center py-8 px-4 sm:px-6 lg:px-8">
-          <div className="w-full max-w-4xl">
+
+
+        <main className="flex flex-1 p-0">
+          <div className="w-full">
             <div className="bg-white shadow-xl rounded-lg overflow-hidden">
               <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-2 bg-slate-50">
                 <div className="flex items-center gap-1">
-                  <button className="p-2 rounded-md text-slate-600 hover:bg-slate-200 hover:text-slate-800 transition-colors">
-                    <span className="material-icons text-xl">format_bold</span>
+                  <button
+                    onClick={() => editor && editor.chain().focus().toggleBold().run()}
+                    className={`p-2 rounded-md ${editor?.isActive('bold') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
+                  >
+                    <span className="font-bold">B</span>
                   </button>
-                  <button className="p-2 rounded-md text-slate-600 hover:bg-slate-200 hover:text-slate-800 transition-colors">
-                    <span className="material-icons text-xl">format_italic</span>
+                  <button
+                    onClick={() => editor && editor.chain().focus().toggleItalic().run()}
+                    className={`p-2 rounded-md ${editor?.isActive('italic') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
+                  >
+                    <span className="italic">I</span>
                   </button>
-                  <button className="p-2 rounded-md text-slate-600 hover:bg-slate-200 hover:text-slate-800 transition-colors">
-                    <span className="material-icons text-xl">format_underlined</span>
+                  <button
+                    onClick={() => editor && editor.chain().focus().toggleUnderline().run()}
+                    className={`p-2 rounded-md ${editor?.isActive('underline') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
+                  >
+                    <span className="underline">U</span>
                   </button>
                   <div className="h-5 w-px bg-slate-300 mx-1"></div>
-                  <button className="p-2 rounded-md text-slate-600 hover:bg-slate-200 hover:text-slate-800 transition-colors">
-                    <span className="material-icons text-xl">format_size</span>
+                  <button
+                    onClick={() => editor && editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                    className={`p-2 rounded-md ${editor?.isActive('heading', { level: 2 }) ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
+                  >
+                    <span className="font-bold">H2</span>
                   </button>
-                  <button className="p-2 rounded-md text-slate-600 hover:bg-slate-200 hover:text-slate-800 transition-colors">
-                    <span className="material-icons text-xl">format_list_bulleted</span>
+                  <button
+                    onClick={() => editor && editor.chain().focus().toggleBulletList().run()}
+                    className={`p-2 rounded-md ${editor?.isActive('bulletList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
+                  >
+                    <span>&bull;</span>
                   </button>
-                  <button className="p-2 rounded-md text-slate-600 hover:bg-slate-200 hover:text-slate-800 transition-colors">
-                    <span className="material-icons text-xl">format_list_numbered</span>
+                  <button
+                    onClick={() => editor && editor.chain().focus().toggleOrderedList().run()}
+                    className={`p-2 rounded-md ${editor?.isActive('orderedList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
+                  >
+                    <span>1.</span>
                   </button>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-500">
@@ -71,14 +134,7 @@ function Editor() {
                   <span>Saved</span>
                 </div>
               </div>
-              <div className="p-1 flex justify-center">
-                <div className="editor-page">
-                  <EditorContent
-                    editor={editor}
-                    className="w-full h-full outline-none"
-                  />
-                </div>
-              </div>
+              <EditorContent editor={editor} className="w-full h-full outline-none text-black"/>
             </div>
           </div>
         </main>
@@ -86,5 +142,9 @@ function Editor() {
     </div>
   )
 }
-
-export default Editor
+Editor.propTypes = {
+  content: PropTypes.string.isRequired,
+  setContent: PropTypes.func.isRequired,
+  editable: PropTypes.bool,
+};
+export default Editor;
