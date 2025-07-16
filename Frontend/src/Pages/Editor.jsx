@@ -40,7 +40,6 @@ function Editor({ content, setContent, editable = true }) {
       console.log('Selection updated:', $from.pos, $to.pos);
     },
   });
-
   return (
     <div className="relative flex size-full min-h-screen flex-col bg-slate-100 group/design-root overflow-x-hidden" style={pageStyle}>
       <div className="layout-container flex h-full grow flex-col">
