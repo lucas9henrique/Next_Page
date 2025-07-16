@@ -1,3 +1,8 @@
+import { useEditor, EditorContent } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import CharacterCount from '@tiptap/extension-character-count';
+import Placeholder from '@tiptap/extension-placeholder'
+
 function Editor() {
   const pageStyle = { fontFamily: 'Manrope, "Noto Sans", sans-serif' }
   const avatarStyle = { backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDm3TJQ2bsuTFWymc2Zk_ul_UFNWm9sNykIz-NMHhL0PoS12Fi486mWOZAn3_x22WDH8S0e4rhwVEmLCTpnn9njxyHcw1I_XeGkUReoLJH4uU6tSBqiAHt9mt0NycVBgx6EjInl8KMxpeLk83j0Y_FpT2REm6zfpNrhd_kVJvxKm2NU8HqgCSs0y84v--Shy1_kE_ZEqg1e8a22HZDG4b8vqbjg12BnuFRUk1gaNbl5ySWLhWKtgGNSnf6NVQhfHyjeDroohmI8BH5_")' }
@@ -66,8 +71,13 @@ function Editor() {
                   <span>Saved</span>
                 </div>
               </div>
-              <div className="p-1">
-                <textarea className="form-textarea w-full resize-none overflow-hidden rounded-md text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent border-transparent bg-white min-h-[calc(100vh-200px)] p-6 text-base font-normal leading-relaxed placeholder:text-slate-400" placeholder="Start typing your document here..."></textarea>
+              <div className="p-1 flex justify-center">
+                <div className="editor-page">
+                  <EditorContent
+                    editor={editor}
+                    className="w-full h-full outline-none"
+                  />
+                </div>
               </div>
             </div>
           </div>
