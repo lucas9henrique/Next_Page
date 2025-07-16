@@ -64,3 +64,33 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.editor-page {
+  width: 210mm;
+  height: 297mm;
+  margin: 20px auto;
+  padding: 20mm 25mm;
+  background: white;
+  overflow: hidden;
+  color: #000;
+}
+
+.ProseMirror {
+  outline: none; /* remove contorno preto */
+  box-sizing: border-box;
+  max-width: 100%;
+  max-height: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.editor-page .ProseMirror {
+  width: 210mm;
+  height: 297mm;
+  overflow-y: hidden;
+}
+
+.page-break {
+  border: 1px dashed #bbb;
+  margin: 32px 0;
+}

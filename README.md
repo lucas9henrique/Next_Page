@@ -20,7 +20,7 @@ O **Next_Page** é um editor de documentos on-line colaborativo que integra, de 
 > Nesta seção, adicione as dependências e frameworks utilizados, por exemplo:  
 > - Frontend:  `React` + `TypeScript`  
 > - Editor de Texto:   
-> - Backend: 
+> - Backend: Python
 > - Banco de Dados: 
 > - Comunicação em Tempo Real:
 > - Controle de Versão Interno:   
@@ -29,7 +29,22 @@ O **Next_Page** é um editor de documentos on-line colaborativo que integra, de 
 - [ ] Node.js (versão X.X.X ou superior)  
 
 ## Como Executar
-1. **Clone o repositório**  
-   ```bash
-   git clone https://github.com/SEU_USUARIO/next_page.git
-   cd next_page
+### 1. Clone e vá para o diretório
+git clone https://github.com/SEU_USUARIO/next_page.git
+cd next_page
+
+### (opcional) ative um virtualenv:
+#### python -m venv venv
+#### source venv/bin/activate
+
+### 2. Backend: instale dependências Python
+ - pip install -r requirements.txt
+ - uvicorn main:app --reload --port 8000
+
+### 3. Frontend: instale e execute
+- cd Frontend
+- npm install
+- npm install --save-dev vite
+- npm install react-router-dom
+- npm run dev
+
