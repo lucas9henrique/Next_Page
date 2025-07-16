@@ -65,40 +65,10 @@ const editor = useEditor({
           <div className="flex flex-1 items-center justify-end gap-6">
             <nav className="flex items-center gap-6 text-sm font-medium text-white">
               <a
-                className="hover:text-[#82F0FA] white"
+                className="hover:text-[#82F0FA] black"
                 href="#"
               >
                 File
-              </a>
-              <a
-                className="hover:text-[#82F0FA] white"
-                href="#"
-              >
-                Edit
-              </a>
-              <a
-                className="hover:text-[#82F0FA] white"
-                href="#"
-              >
-                View
-              </a>
-              <a
-                className="hover:text-[#82F0FA] white"
-                href="#"
-              >
-                Insert
-              </a>
-              <a
-                className="hover:text-[#82F0FA] white"
-                href="#"
-              >
-                Format
-              </a>
-              <a
-                className="hover:text-[#000000] white"
-                href="#"
-              >
-                Tools
               </a>
             </nav>
             <div className="flex items-center gap-2">
