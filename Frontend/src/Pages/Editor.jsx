@@ -26,9 +26,7 @@ function Editor({ content, setContent, editable = true }) {
     HeaderFooterNode,
     BodyNode,
   ];
-
-  /* instância do editor */
-  const editor = useEditor({
+const editor = useEditor({
     extensions,
     content,
     editable,
@@ -41,25 +39,67 @@ function Editor({ content, setContent, editable = true }) {
     },
   });
   return (
-    <div className="relative flex size-full min-h-screen flex-col bg-slate-100 group/design-root overflow-x-hidden" style={pageStyle}>
+    <div
+      className="relative flex size-full min-h-screen flex-col bg-gradient-to-b from-[#625DF5] to-transparent group/design-root overflow-x-hidden"
+      style={pageStyle}
+    >
       <div className="layout-container flex h-full grow flex-col">
-        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 bg-white px-6 py-3 shadow-sm">
-          <div className="flex items-center gap-3 text-slate-800">
-            <div className="size-6 text-blue-600">
-              <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                <path d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z" fill="currentColor" />
+        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 bg-transparent px-6 py-3 shadow-sm">
+          <div className="flex items-center gap-3 text-white">
+            <div className="size-6 text-white">
+              <svg
+                fill="none"
+                viewBox="0 0 48 48"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z"
+                  fill="currentColor"
+                />
               </svg>
             </div>
-            <h1 className="text-slate-900 text-xl font-bold leading-tight tracking-tight">CodeCollab</h1>
+            <h1 className="text-white text-xl font-bold leading-tight tracking-tight">
+              CodeCollab
+            </h1>
           </div>
           <div className="flex flex-1 items-center justify-end gap-6">
-            <nav className="flex items-center gap-6 text-sm font-medium text-slate-600">
-              <a className="hover:text-blue-600 transition-colors" href="#">File</a>
-              <a className="hover:text-blue-600 transition-colors" href="#">Edit</a>
-              <a className="hover:text-blue-600 transition-colors" href="#">View</a>
-              <a className="hover:text-blue-600 transition-colors" href="#">Insert</a>
-              <a className="hover:text-blue-600 transition-colors" href="#">Format</a>
-              <a className="hover:text-blue-600 transition-colors" href="#">Tools</a>
+            <nav className="flex items-center gap-6 text-sm font-medium text-white">
+              <a
+                className="hover:text-[#82F0FA] white"
+                href="#"
+              >
+                File
+              </a>
+              <a
+                className="hover:text-[#82F0FA] white"
+                href="#"
+              >
+                Edit
+              </a>
+              <a
+                className="hover:text-[#82F0FA] white"
+                href="#"
+              >
+                View
+              </a>
+              <a
+                className="hover:text-[#82F0FA] white"
+                href="#"
+              >
+                Insert
+              </a>
+              <a
+                className="hover:text-[#82F0FA] white"
+                href="#"
+              >
+                Format
+              </a>
+              <a
+                className="hover:text-[#000000] white"
+                href="#"
+              >
+                Tools
+              </a>
             </nav>
             <div className="flex items-center gap-2">
               <button
@@ -81,7 +121,10 @@ function Editor({ content, setContent, editable = true }) {
                 <span className="material-icons text-xl">save</span>
               </button>
             </div>
-            <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9 border-2 border-white shadow-sm" style={avatarStyle}></div>
+            <div
+              className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9 border-2 border-white shadow-sm"
+              style={avatarStyle}
+            ></div>
           </div>
         </header>
 
@@ -130,7 +173,9 @@ function Editor({ content, setContent, editable = true }) {
                   </button>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-500">
-                  <span className="material-icons text-base text-green-500">cloud_done</span>
+                  <span className="material-icons text-base text-green-500">
+                    cloud_done
+                  </span>
                   <span>Saved</span>
                 </div>
               </div>
