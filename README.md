@@ -38,11 +38,13 @@ cd next_page
 #### source venv/bin/activate
 
 ### 2. Backend: instale dependências Python
-pip install -r requirements.txt
+ - pip install -r requirements.txt
+ - uvicorn main:app --reload --port 8000
 
 ### 3. Frontend: instale e execute
-cd Frontend
-npm install
-npm install --save-dev vite
-npm run dev
+- cd Frontend
+- npm install
+- npm install --save-dev vite
+- npm install react-router-dom
+- npm run dev
 

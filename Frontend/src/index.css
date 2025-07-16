@@ -65,16 +65,24 @@ button:focus-visible {
   }
 }
 
-.editor-page {
-  width: 210mm;
-  min-height: 297mm;
-  margin: 20px auto;
-  padding: 20mm 25mm;
-  background: white;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+div.body {
+  margin: 0 auto !important;      /* centraliza horizontalmente */
+  padding: 0 !important;
+  width: 100% !important;         /* ocupa toda a largura disponível */
+  max-width: 100% !important;
+  box-sizing: border-box;
 }
 
-.page-break {
-  border: 1px dashed #bbb;
-  margin: 32px 0;
+div.page{
+  height: 240mm !important; 
+}
+
+.ProseMirror:focus {
+  outline: none !important;
+}
+
+/* override page spacing from the pagination plugin */
+.page {
+  margin: 24px auto !important;
+  padding: 0 !important;
 }
