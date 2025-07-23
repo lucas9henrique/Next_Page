@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "prop-types": "^15.8.1",
+    "tiptap-extension-pagination": "^2.1.4"
+  }
+}
