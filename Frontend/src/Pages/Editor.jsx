@@ -18,11 +18,7 @@ const avatarStyle = {
 function Editor({editable = true }) {
   const { id } = useParams()
   const [content, setContent] = useState('')
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isCollapseOpen, setIsCollapseOpen] = useState(false);
-
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-  const toggleCollapseMenu = () => setIsCollapseOpen(!isCollapseOpen);
+  
   /* extensões que o Tiptap deve carregar */
   const extensions = [
     StarterKit,
@@ -87,37 +83,6 @@ function Editor({editable = true }) {
             <h1 className="text-2xl font-bold tracking-tight">Next_Page</h1>
           </div>
           <div className="flex flex-1 items-center justify-end gap-6 relative">
-            {/* Menu colapsável para desktop */}
-            <div className="hidden md:block relative">
-              <button
-                onClick={toggleCollapseMenu}
-                className="flex items-center gap-1 text-white font-medium hover:text-[#82F0FA] transition-colors"
-              >
-                Menu
-                <svg
-                  className={`w-4 h-4 transform transition-transform duration-300 ${isCollapseOpen ? 'rotate-180' : 'rotate-0'}`}
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              <div
-                className={`absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-md z-50 transition-all duration-300 origin-top-right ${isCollapseOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'
-                  }`}
-              >
-                <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">File</a>
-                <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>
-                <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View</a>
-                <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Insert</a>
-                <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Format</a>
-                <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Tools</a>
-              </div>
-            </div>
-
             {/* Botões de ação */}
             <div className="flex items-center gap-2">
               <button
@@ -154,48 +119,9 @@ function Editor({editable = true }) {
               className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9 border-2 border-white shadow-sm"
               style={avatarStyle}
             ></div>
-
-            {/* Botão menu mobile */}
-            <button
-              onClick={toggleMobileMenu}
-              className="md:hidden flex items-center justify-center rounded-md p-2 text-white hover:bg-slate-200 hover:text-slate-700 transition-colors"
-              aria-label="Toggle menu"
-            >
-              <svg className="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
           </div>
         </header>
-
-        {/* Overlay para menu mobile */}
-        {isMobileMenuOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={toggleMobileMenu}></div>
-        )}
-
         {/* Menu lateral mobile */}
-        <div
-          className={`fixed inset-y-0 right-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-            } md:hidden`}
-        >
-          <nav className="flex flex-col p-6 w-full">
-            <button
-              onClick={toggleMobileMenu}
-              className="self-end flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors mb-4"
-              aria-label="Close menu"
-            >
-              <svg className="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            {['File', 'Edit', 'View', 'Insert', 'Format', 'Tools'].map(item => (
-              <a key={item} href="#" className="block py-2 text-slate-800 hover:bg-slate-100 rounded-md px-2">
-                {item}
-              </a>
-            ))}
-          </nav>
-        </div>
-
         {/* Editor */}
         <div className="w-full max-w-4xl rounded-xl bg-white p-8 shadow-2xl flex flex-col min-h-[60vh]">
           <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-2 bg-slate-50 rounded-t-lg -mx-8 -mt-8 mb-4">
