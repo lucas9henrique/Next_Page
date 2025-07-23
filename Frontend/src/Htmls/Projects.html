@@ -23,10 +23,19 @@
     <span class="material-icons-outlined absolute left-3 text-slate-500">search</span>
     <input class="form-input w-full rounded-lg border-slate-300 bg-slate-50 py-2 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-500 focus:border-[#0c7ff2] focus:ring-[#0c7ff2]" placeholder="Search in projects" value=""/>
     </label>
-    <button class="flex min-w-[84px] items-center justify-center gap-2 overflow-hidden rounded-lg bg-[#0c7ff2] px-4 py-2.5 text-sm font-semibold text-slate-50 transition-colors hover:bg-blue-600">
+    <div class="relative">
+    <button onclick="toggleMenu(event)" class="flex min-w-[84px] items-center justify-center gap-2 overflow-hidden rounded-lg bg-[#0c7ff2] px-4 py-2.5 text-sm font-semibold text-slate-50 transition-colors hover:bg-blue-600">
     <span class="material-icons-round text-lg">add_circle_outline</span>
     <span class="truncate">New Project</span>
     </button>
+    <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-64 space-y-3 rounded-md bg-white p-4 shadow-lg z-50">
+      <button onclick="createDoc()" class="w-full rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-600">Create New Document</button>
+      <form onsubmit="joinDoc(event)" class="flex gap-2">
+        <input id="shareInput" type="text" placeholder="Share code" class="flex-1 rounded-md border border-slate-300 px-2 py-1 text-sm" />
+        <button type="submit" class="rounded-md bg-blue-500 px-3 py-1 text-sm font-semibold text-white hover:bg-blue-600">Enter</button>
+      </form>
+    </div>
+    </div>
     <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border border-slate-200" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCB6kVfzkQcBJF-8Zr1op7XJrlSN3T2Agi9wDUjMD68R0N8sGPe8esmtrBe0JADQKJJNPDaHqftmNjQc8WBlB0yIBrHYinma-jSOvQDGlZBAastI2-ktuyE8nMxLq5J0CTRHeom7baiN7PQ7AYWJUFmlpj66JHXQDEE066jct78l4twgYMkhwRWT6GpqeEOC6q9iCo35PZQjyoz9L468FVYYBWX4zFUL-hLHYCiWpt4P_DwAMPsipIFakokvPswucCpsbF-6Efpk7xl");'></div>
     </div>
     </header>
@@ -163,5 +172,27 @@
     </main>
     </div>
     </div>
-    
+
+    <script>
+      function toggleMenu(e) {
+        const menu = document.getElementById('dropdownMenu');
+        menu.classList.toggle('hidden');
+      }
+      function createDoc() {
+        fetch('http://localhost:8000/documents', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: 'Untitled' })
+        })
+          .then(r => r.ok ? r.json() : Promise.reject(r))
+          .then(d => { window.location.href = `/editor/${d.id}`; });
+      }
+      function joinDoc(ev) {
+        ev.preventDefault();
+        const code = document.getElementById('shareInput').value.trim();
+        if (code) window.location.href = `/editor/${code}`;
+      }
+    </script>
+
     </body></html>
+

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useRef } from 'react'
 import { UserContext } from './UserContext.jsx'
 import { useNavigate } from 'react-router-dom'
 import logo from '../assets/logo1.png'
@@ -9,6 +9,8 @@ export default function Projects() {
   const [shareCode, setShareCode] = useState('')
   const { userId, token } = useContext(UserContext)
   const navigate = useNavigate()
+  const menuRef = useRef(null)
+  const buttonRef = useRef(null)
 
   useEffect(() => {
     if (!userId) return
@@ -23,6 +25,24 @@ export default function Projects() {
       .then(data => setProjects(Array.isArray(data) ? data : []))
       .catch(() => setProjects([]))
   }, [userId, token])
+
+  useEffect(() => {
+    if (!menuOpen) return
+
+    function handleOutside(event) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target)
+      ) {
+        setMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleOutside)
+    return () => document.removeEventListener('mousedown', handleOutside)
+  }, [menuOpen])
 
   const handleCreate = () => {
     fetch('http://localhost:8000/documents', {
@@ -66,13 +86,16 @@ export default function Projects() {
               className="w-64 rounded-lg border border-slate-200 px-4 py-2 text-sm"
             />
             <button
+              ref={buttonRef}
               onClick={() => setMenuOpen(prev => !prev)}
               className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-600"
             >
               New Project
             </button>
             {menuOpen && (
-              <div className="absolute right-0 top-12 z-50 w-64 rounded-md bg-white p-4 shadow-lg space-y-3">
+              <div
+                ref={menuRef}
+                className="absolute right-0 top-12 z-80 w-164 rounded-md bg-white p-4 shadow-lg space-y-3">
                 <button
                   onClick={handleCreate}
                   className="w-full rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-600"
@@ -85,7 +108,7 @@ export default function Projects() {
                     value={shareCode}
                     onChange={e => setShareCode(e.target.value)}
                     placeholder="Share code"
-                    className="flex-1 rounded-md border border-slate-300 px-2 py-1 text-sm"
+                    className="flex-1 rounded-md border border-slate-300 px-2 py-1 text-black text-sm"
                   />
                   <button
                     type="submit"
@@ -106,11 +129,9 @@ export default function Projects() {
           </div>
         </div>
       </header>
-
       {/* espaço para não sobrepor o header */}
       <main className="pt-[68px] px-6">
         <div className="max-w-7xl mx-auto">
-          {/* título abaixo da linha */}
           <h1 className="text-white text-3xl font-bold mt-10 mb-6">Your Projects</h1>
 
           <div className="overflow-hidden rounded-lg bg-white shadow-sm">
@@ -143,11 +164,10 @@ export default function Projects() {
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                            proj.main_branch === 'main'
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${proj.main_branch === 'main'
                               ? 'bg-green-100 text-green-800'
                               : 'bg-blue-100 text-blue-800'
-                          }`}
+                            }`}
                         >
                           {proj.main_branch}
                         </span>
