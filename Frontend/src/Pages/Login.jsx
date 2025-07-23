@@ -1,38 +1,31 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useContext  } from 'react'
 import './Login.css'
 import logo from '../assets/logo1.png'
 import { Link, useNavigate } from 'react-router-dom'
+import { UserContext } from './UserContext.jsx'
 
 function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const { login } = useContext(UserContext)
   const errorRef = useRef(null)
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const resp = await fetch('http://localhost:8000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
-      if (!resp.ok) {
-        const data = await resp.json()
-        setError(data.detail || 'Login failed')
-        const node = errorRef.current
-        if (node) {
-          node.style.animation = 'none'
-          node.offsetHeight
-          node.style.animation = ''
-        }
-      } else {
-        setError('')
-        navigate('/projects')
-      }
+      await login(email, password)
+      setError('')
+      navigate('/projects')
     } catch (err) {
-      setError('Network error')
+      setError(err.message || 'Login failed')
+      const node = errorRef.current
+      if (node) {
+        node.style.animation = 'none'
+        node.offsetHeight
+        node.style.animation = ''
+      }
     }
   }
 

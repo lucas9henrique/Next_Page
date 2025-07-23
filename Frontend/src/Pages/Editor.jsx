@@ -10,20 +10,25 @@ import OrderedList from '@tiptap/extension-ordered-list'
 import ListItem from '@tiptap/extension-list-item'
 import Underline from './Underline'
 import PaginationExtension, { PageNode, HeaderFooterNode, BodyNode } from "tiptap-extension-pagination";
-import logo from '../assets/logo1.png'
-import save from '../assets/save.png'
-import undo from '../assets/undo.png'
-import redo from '../assets/redo.png'
-import center_align from '../assets/center-align.png'
-import left_align from '../assets/left-align.png'
-import right_align from '../assets/right-align.png'
-import just_align from '../assets/justification.png'
-import underline_font from '../assets/underline.png'
-import bold_font from '../assets/bold.png'
-import italic_font from '../assets/italic.png'
-import loaderGif from '../assets/loader.gif'
-import cloudIcon from '../assets/cloud.png'
-import cloudOffIcon from '../assets/cloud-off.png'
+// Imagens
+// — Geral
+import logo          from '../assets/logo1.png';
+import loaderGif     from '../assets/loader.gif';
+import cloudIcon     from '../assets/cloud.png';
+import cloudOffIcon  from '../assets/cloud-off.png';
+// — Ações de edição
+import redo          from '../assets/redo.png';
+import save          from '../assets/save.png';
+import undo          from '../assets/undo.png';
+// — Alinhamento de texto
+import center_align  from '../assets/center-align.png';
+import just_align    from '../assets/justification.png';
+import left_align    from '../assets/left-align.png';
+import right_align   from '../assets/right-align.png';
+// — Estilo de fonte
+import bold_font     from '../assets/bold.png';
+import italic_font   from '../assets/italic.png';
+import underline_font from '../assets/underline.png';
 
 const pageStyle = { fontFamily: '"Roboto", "Noto Sans", sans-serif' };
 const avatarStyle = {
