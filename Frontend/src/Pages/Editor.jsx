@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
-import PropTypes from 'prop-types';
-import StarterKit from '@tiptap/starter-kit';
-import Underline from './Underline';
-import PaginationExtension, { PageNode, HeaderFooterNode, BodyNode } from 'tiptap-extension-pagination';
+import { useState, useEffect } from 'react'
+import { useEditor, EditorContent } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import Underline from './Underline'
+import PaginationExtension, { PageNode, HeaderFooterNode, BodyNode } from "tiptap-extension-pagination";
 import logo from '../assets/logo1.png'
 import save from '../assets/save.png'
 import undo from '../assets/undo.png'
@@ -16,12 +15,14 @@ const avatarStyle = {
 };
 
 function Editor({ content, setContent, editable = true }) {
+  const { id } = useParams()
+  const [content, setContent] = useState('')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCollapseOpen, setIsCollapseOpen] = useState(false);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const toggleCollapseMenu = () => setIsCollapseOpen(!isCollapseOpen);
-
+  /* extensões que o Tiptap deve carregar */
   const extensions = [
     StarterKit,
     Underline,
@@ -42,14 +43,32 @@ function Editor({ content, setContent, editable = true }) {
     content,
     editable,
     onUpdate({ editor }) {
-      setContent(editor.getHTML());
+      setContent(editor.getHTML())
     },
-    onSelectionUpdate({ editor }) {
-      const { $from, $to } = editor.state.selection;
-      console.log('Selection updated:', $from.pos, $to.pos);
-    },
-  });
+  })
 
+  useEffect(() => {
+    fetch(`http://localhost:8000/api/load/${id}`)
+      .then((res) => res.ok ? res.json() : Promise.reject(res))
+      .then((data) => {
+        const html = data.content || ''
+        setContent(html)
+        if (editor) {
+          editor.commands.setContent(html)
+        }
+      })
+      .catch(() => {})
+  }, [id, editor])
+
+  useEffect(() => {
+    if (!id) return
+    fetch(`http://localhost:8000/api/save/${id}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content }),
+      })
+  }, [content, id])
   return (
     <div className="bg-slate-100" style={pageStyle}>
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#625DF5] to-transparent p-6">
@@ -235,11 +254,5 @@ function Editor({ content, setContent, editable = true }) {
     </div>
   );
 }
-
-Editor.propTypes = {
-  content: PropTypes.string.isRequired,
-  setContent: PropTypes.func.isRequired,
-  editable: PropTypes.bool,
-};
-
 export default Editor;
+
