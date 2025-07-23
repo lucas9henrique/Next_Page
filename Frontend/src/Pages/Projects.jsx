@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { UserContext } from './UserContext.jsx'
+import { useNavigate } from 'react-router-dom'
 import logo from '../assets/logo1.png'
 
 export default function Projects() {
   const [projects, setProjects] = useState([])
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [shareCode, setShareCode] = useState('')
   const { userId, token } = useContext(UserContext)
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!userId) return
@@ -20,6 +24,28 @@ export default function Projects() {
       .catch(() => setProjects([]))
   }, [userId, token])
 
+  const handleCreate = () => {
+    fetch('http://localhost:8000/documents', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: 'Untitled' }),
+    })
+      .then(res => (res.ok ? res.json() : Promise.reject(res)))
+      .then(data => {
+        setMenuOpen(false)
+        navigate(`/editor/${data.id}`)
+      })
+      .catch(() => setMenuOpen(false))
+  }
+
+  const handleJoin = e => {
+    e.preventDefault()
+    if (shareCode.trim()) {
+      setMenuOpen(false)
+      navigate(`/editor/${shareCode.trim()}`)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#625DF5] to-transparent">
       {/* HEADER FIXO */}
@@ -33,20 +59,48 @@ export default function Projects() {
             />
             <span className="text-2xl font-bold">Next_Page</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 relative">
             <input
               type="text"
               placeholder="Search in projects"
               className="w-64 rounded-lg border border-slate-200 px-4 py-2 text-sm"
             />
-            <button className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-600">
+            <button
+              onClick={() => setMenuOpen(prev => !prev)}
+              className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-600"
+            >
               New Project
             </button>
+            {menuOpen && (
+              <div className="absolute right-0 top-12 z-50 w-64 rounded-md bg-white p-4 shadow-lg space-y-3">
+                <button
+                  onClick={handleCreate}
+                  className="w-full rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-600"
+                >
+                  Create New Document
+                </button>
+                <form onSubmit={handleJoin} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={shareCode}
+                    onChange={e => setShareCode(e.target.value)}
+                    placeholder="Share code"
+                    className="flex-1 rounded-md border border-slate-300 px-2 py-1 text-sm"
+                  />
+                  <button
+                    type="submit"
+                    className="rounded-md bg-blue-500 px-3 py-1 text-sm font-semibold text-white hover:bg-blue-600"
+                  >
+                    Enter
+                  </button>
+                </form>
+              </div>
+            )}
             <div
               className="w-10 h-10 rounded-full bg-cover bg-center border"
               style={{
                 backgroundImage:
-                  'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCB6kVfzkQcBJF-8Zr1op7XJrlSN3T2Agi9wDUjMD68R0N8sGPe8esmtrBe0JADQKJJNPDaHqftmNjQc8WBlB0yIBrHYinma-jSOvQDGlZBAastI2-ktuyE8nMxLq5J0CTRHeom7baiN7PQ7AYWJUFmlpj66JHXQDEE066jct78l4twgYMkhwRWT6GpqeEOC6q9iCo35PZQjyoz9L468FVYYBWX4zFUL-hLHYCiWpt4P_DwAMPsipIFakokvPswucCpsbF-6Efpk7xl")' ,
+                  'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCB6kVfzkQcBJF-8Zr1op7XJrlSN3T2Agi9wDUjMD68R0N8sGPe8esmtrBe0JADQKJJNPDaHqftmNjQc8WBlB0yIBrHYinma-jSOvQDGlZBAastI2-ktuyE8nMxLq5J0CTRHeom7baiN7PQ7AYWJUFmlpj66JHXQDEE066jct78l4twgYMkhwRWT6GpqeEOC6q9iCo35PZQjyoz9L468FVYYBWX4zFUL-hLHYCiWpt4P_DwAMPsipIFakokvPswucCpsbF-6Efpk7xl")',
               }}
             />
           </div>
