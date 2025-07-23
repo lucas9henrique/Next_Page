@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
+import TextAlign from '@tiptap/extension-text-align'
 import { useParams } from 'react-router-dom'
 import StarterKit from '@tiptap/starter-kit'
 import Italic from '@tiptap/extension-italic'
@@ -13,6 +14,16 @@ import logo from '../assets/logo1.png'
 import save from '../assets/save.png'
 import undo from '../assets/undo.png'
 import redo from '../assets/redo.png'
+import center_align from '../assets/center-align.png'
+import left_align from '../assets/left-align.png'
+import right_align from '../assets/right-align.png'
+import just_align from '../assets/justification.png'
+import underline_font from '../assets/underline.png'
+import bold_font from '../assets/bold.png'
+import italic_font from '../assets/italic.png'
+import loaderGif from '../assets/loader.gif'
+import cloudIcon from '../assets/cloud.png'
+import cloudOffIcon from '../assets/cloud-off.png'
 
 const pageStyle = { fontFamily: '"Roboto", "Noto Sans", sans-serif' };
 const avatarStyle = {
@@ -20,10 +31,23 @@ const avatarStyle = {
     'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDm3TJQ2bsuTFWymc2Zk_ul_UFNWm9sNykIz-NMHhL0PoS12Fi486mWOZAn3_x22WDH8S0e4rhwVEmLCTpnn9njxyHcw1I_XeGkUReoLJH4uU6tSBqiAHt9mt0NycVBgx6EjInl8KMxpeLk83j0Y_FpT2REm6zfpNrhd_kVJvxKm2NU8HqgCSs0y84v--Shy1_kE_ZEqg1e8a22HZDG4b8vqbjg12BnuFRUk1gaNbl5ySWLhWKtgGNSnf6NVQhfHyjeDroohmI8BH5_")',
 };
 
-function Editor({editable = true }) {
+const alignButtons = [
+  { img: left_align, alt: 'Alinhar à esquerda', action: 'alignLeft' },
+  { img: center_align, alt: 'Centralizar texto', action: 'alignCenter' },
+  { img: right_align, alt: 'Alinhar à direita', action: 'alignRight' },
+  { img: just_align, alt: 'Justificar texto', action: 'alignJustify' },]
+
+const styleButtons = [
+  { img: bold_font, alt: 'Negrito', action: 'bold' },
+  { img: italic_font, alt: 'Itálico', action: 'italic' },
+  { img: underline_font, alt: 'Sublinhar', action: 'underline' },
+]
+
+function Editor({ editable = true }) {
   const { id } = useParams()
   const [content, setContent] = useState('')
-  
+  const [saveStatus, setSaveStatus] = useState('idle')
+
   /* extensões que o Tiptap deve carregar */
   const extensions = [
     StarterKit.configure({
@@ -55,6 +79,9 @@ function Editor({editable = true }) {
       },
       BorderConfig: { top: 0, right: 0, bottom: 0, left: 0 },
     }),
+    TextAlign.configure({
+      types: ['paragraph', 'heading'],
+    }),
     PageNode,
     HeaderFooterNode,
     BodyNode,
@@ -79,16 +106,24 @@ function Editor({editable = true }) {
           editor.commands.setContent(html)
         }
       })
-      .catch(() => {})
+      .catch(() => { })
   }, [id, editor])
 
   useEffect(() => {
     if (!id) return
+    setSaveStatus('saving')
     fetch(`http://localhost:8000/api/save/${id}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content }),
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('save failed')
+        setSaveStatus('saved')
+      })
+      .catch(() => {
+        setSaveStatus('error')
       })
   }, [content, id])
 
@@ -113,6 +148,18 @@ function Editor({editable = true }) {
         break
       case 'orderedList':
         chain.toggleOrderedList().run()
+        break
+      case 'alignLeft':
+        chain.setTextAlign('left').run()
+        break
+      case 'alignCenter':
+        chain.setTextAlign('center').run()
+        break
+      case 'alignRight':
+        chain.setTextAlign('right').run()
+        break
+      case 'alignJustify':
+        chain.setTextAlign('justify').run()
         break
       default:
         break
@@ -141,28 +188,28 @@ function Editor({editable = true }) {
                 onClick={() => editor && editor.commands.undo()}
                 className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
               > <img
-              src={undo}
-              alt="undo"
-              className="w-5 h-5"
-            />
+                  src={undo}
+                  alt="undo"
+                  className="w-5 h-5"
+                />
               </button>
               <button
                 onClick={() => editor && editor.commands.redo()}
                 className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
               > <img
-              src={redo}
-              alt="redo"
-              className="w-5 h-5"
-            />
+                  src={redo}
+                  alt="redo"
+                  className="w-5 h-5"
+                />
               </button>
               <button
-                onClick={() => editor && console.log(editor.getHTML())}   
+                onClick={() => editor && console.log(editor.getHTML())}
                 className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"           >
                 <img
-                src={save}
-                alt="save"
-                className="w-5 h-5"
-              />
+                  src={save}
+                  alt="save"
+                  className="w-5 h-5"
+                />
               </button>
             </div>
 
@@ -173,27 +220,24 @@ function Editor({editable = true }) {
             ></div>
           </div>
         </header>
-        {/* Menu lateral mobile */}
         {/* Editor */}
         <div className="w-full max-w-4xl rounded-xl bg-white p-8 shadow-2xl flex flex-col min-h-[60vh]">
           <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-2 bg-slate-50 rounded-t-lg -mx-8 -mt-8 mb-4">
             <div className="flex items-center gap-1">
-              {[
-                { label: 'B', action: 'bold' },
-                { label: 'I', action: 'italic' },
-                { label: 'U', action: 'underline' },
-              ].map(({ label, action }) => (
+              {/* Botões de fonte */}
+              {styleButtons.map(({ img, alt, action }) => (
                 <button
                   key={action}
                   onClick={() => handleAction(action)}
-                  className={`p-2 rounded-md ${editor?.isActive(action)
-                      ? 'bg-slate-200 text-slate-800'
-                      : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
-                    } transition-colors`}
-                >
-                  <span className={label.toLowerCase()}>{label}</span>
+                  className={`
+        p-2 rounded-md transition-colors
+        ${editor?.isActive(action)
+                      ? 'bg-slate-200'
+                      : 'hover:bg-slate-200'}`}>
+                  <img src={img} alt={alt} className="w-4 h-4" />
                 </button>
               ))}
+              {/* Botões de texto */}
               <div className="h-5 w-px bg-slate-300 mx-1"></div>
               <button
                 onClick={() => handleAction('heading2')}
@@ -216,11 +260,59 @@ function Editor({editable = true }) {
               >
                 <span>1.</span>
               </button>
+              <div className="h-5 w-px bg-slate-300 mx-1"></div>
+              <div className="flex items-center gap-2">
+                {alignButtons.map(({ img, alt, action }) => (
+                  <button
+                    key={action}
+                    onClick={() => handleAction(action)}
+                    className={`
+          p-2 rounded-md transition-colors
+          ${editor?.isActive({ textAlign: action.replace('align', '').toLowerCase() })
+                        ? 'bg-slate-200'
+                        : 'hover:bg-slate-200'
+                      } `}
+                  >
+                    <img src={img} alt={alt} className="w-5 h-5" />
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-sm text-slate-500">
-              <span className="material-icons text-base text-green-500">cloud_done</span>
-              <span>Saved</span>
+            {/* salvamento */}
+            <div className="flex items-center gap-2 text-sm">
+              {saveStatus === 'saving' && (
+                <img src={loaderGif} alt="Salvando..." className="w-5 h-5 animate-spin" />
+              )}
+              {saveStatus === 'saved' && (
+                <>
+                  <img
+                    src={cloudIcon}
+                    alt="Salvo"
+                    className="w-5 h-5"
+                  />
+                  <span className="text-green-400">Salvo</span>
+                </>
+              )}
+              {saveStatus === 'error' && (
+                <>
+                  <img
+                    src={cloudOffIcon}
+                    alt="Erro ao salvar"
+                    className="w-5 h-5"
+                  />
+                  <span className="text-red-400">Erro ao salvar</span>
+                </>
+              )}
+              {saveStatus === 'idle' && (
+                <img
+                  src={cloudIcon}
+                  alt="Pronto"
+                  className="w-5 h-5 text-gray-400"
+                />
+              )}
             </div>
+
+            {/* editor de texto */}
           </div>
           <EditorContent editor={editor} className="w-full h-full outline-none text-black flex-grow p-10" />
         </div>

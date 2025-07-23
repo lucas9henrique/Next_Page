@@ -185,25 +185,35 @@ def merge_branches(data: MergeData, email: str = Depends(verify_token)):
         raise HTTPException(status_code=400, detail=f"Merge failed: {e}")
     return {"msg": "Merge completed"}
 
+#Comentei só pra ver o gif funcionando lá no front, quando tiver criando certinho descomentamos!
+
+# @app.post("/api/save/{document}")
+# def save_document(document: str, data: DocumentData, email: str = Depends(verify_token)):
+#     repo_path = os.path.join(REPOS_ROOT, email, document)
+#     if not os.path.exists(repo_path):
+#         raise HTTPException(status_code=404, detail="Document not found")
+#     repo = Repo(repo_path)
+#     branch = data.branch or "main"
+#     if branch in repo.heads:
+#         repo.git.checkout(branch)
+#     else:
+#         repo.git.checkout("-b", branch)
+#     doc_file = os.path.join(repo_path, "document.txt")
+#     with open(doc_file, "w", encoding="utf-8") as f:
+#         f.write(data.content)
+#     repo.index.add(["document.txt"])
+#     actor = Actor(email, email)
+#     repo.index.commit(data.message or "Update", author=actor, committer=actor)
+#     return {"msg": "Document saved"}
 
 @app.post("/api/save/{document}")
-def save_document(document: str, data: DocumentData, email: str = Depends(verify_token)):
-    repo_path = os.path.join(REPOS_ROOT, email, document)
-    if not os.path.exists(repo_path):
-        raise HTTPException(status_code=404, detail="Document not found")
-    repo = Repo(repo_path)
-    branch = data.branch or "main"
-    if branch in repo.heads:
-        repo.git.checkout(branch)
-    else:
-        repo.git.checkout("-b", branch)
-    doc_file = os.path.join(repo_path, "document.txt")
-    with open(doc_file, "w", encoding="utf-8") as f:
-        f.write(data.content)
-    repo.index.add(["document.txt"])
-    actor = Actor(email, email)
-    repo.index.commit(data.message or "Update", author=actor, committer=actor)
+def save_document(document: str, data: DocumentData):
     return {"msg": "Document saved"}
+
+
+@app.get("/api/load/{document}")
+def load_document(document_id: str):
+    return {"msg": "Document loaded"}
 
 
 @app.get("/api/history/{document}")
@@ -229,5 +239,5 @@ def commit_history(document: str, branch: str | None = None, email: str = Depend
                 "timestamp": c.committed_datetime.isoformat(),
                 "diff": diff,
             }
-        )
+        )        
     return commits
