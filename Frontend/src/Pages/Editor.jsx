@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import { useParams } from 'react-router-dom'
 import StarterKit from '@tiptap/starter-kit'
+import Italic from '@tiptap/extension-italic'
+import Heading from '@tiptap/extension-heading'
+import BulletList from '@tiptap/extension-bullet-list'
+import OrderedList from '@tiptap/extension-ordered-list'
+import ListItem from '@tiptap/extension-list-item'
 import Underline from './Underline'
 import PaginationExtension, { PageNode, HeaderFooterNode, BodyNode } from "tiptap-extension-pagination";
 import logo from '../assets/logo1.png'
@@ -21,7 +26,27 @@ function Editor({editable = true }) {
   
   /* extensões que o Tiptap deve carregar */
   const extensions = [
-    StarterKit,
+    StarterKit.configure({
+      italic: false,
+      heading: false,
+      bulletList: false,
+      orderedList: false,
+      listItem: false,
+    }),
+    Italic.configure({
+      HTMLAttributes: { class: 'italic' },
+    }),
+    Heading.configure({
+      levels: [1, 2, 3],
+      HTMLAttributes: { class: 'text-2xl font-semibold' },
+    }),
+    BulletList.configure({
+      HTMLAttributes: { class: 'list-disc list-inside' },
+    }),
+    OrderedList.configure({
+      HTMLAttributes: { class: 'list-decimal list-inside' },
+    }),
+    ListItem,
     Underline,
     PaginationExtension.configure({
       pageAmendmentOptions: {
