@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
+import { useParams } from 'react-router-dom'
 import StarterKit from '@tiptap/starter-kit'
 import Underline from './Underline'
 import PaginationExtension, { PageNode, HeaderFooterNode, BodyNode } from "tiptap-extension-pagination";
@@ -14,7 +15,7 @@ const avatarStyle = {
     'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDm3TJQ2bsuTFWymc2Zk_ul_UFNWm9sNykIz-NMHhL0PoS12Fi486mWOZAn3_x22WDH8S0e4rhwVEmLCTpnn9njxyHcw1I_XeGkUReoLJH4uU6tSBqiAHt9mt0NycVBgx6EjInl8KMxpeLk83j0Y_FpT2REm6zfpNrhd_kVJvxKm2NU8HqgCSs0y84v--Shy1_kE_ZEqg1e8a22HZDG4b8vqbjg12BnuFRUk1gaNbl5ySWLhWKtgGNSnf6NVQhfHyjeDroohmI8BH5_")',
 };
 
-function Editor({ content, setContent, editable = true }) {
+function Editor({editable = true }) {
   const { id } = useParams()
   const [content, setContent] = useState('')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
