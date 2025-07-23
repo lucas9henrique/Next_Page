@@ -14,7 +14,7 @@ import save from '../assets/save.png'
 import undo from '../assets/undo.png'
 import redo from '../assets/redo.png'
 
-const pageStyle = { fontFamily: 'Manrope, "Noto Sans", sans-serif' };
+const pageStyle = { fontFamily: '"Roboto", "Noto Sans", sans-serif' };
 const avatarStyle = {
   backgroundImage:
     'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDm3TJQ2bsuTFWymc2Zk_ul_UFNWm9sNykIz-NMHhL0PoS12Fi486mWOZAn3_x22WDH8S0e4rhwVEmLCTpnn9njxyHcw1I_XeGkUReoLJH4uU6tSBqiAHt9mt0NycVBgx6EjInl8KMxpeLk83j0Y_FpT2REm6zfpNrhd_kVJvxKm2NU8HqgCSs0y84v--Shy1_kE_ZEqg1e8a22HZDG4b8vqbjg12BnuFRUk1gaNbl5ySWLhWKtgGNSnf6NVQhfHyjeDroohmI8BH5_")',
@@ -41,10 +41,10 @@ function Editor({editable = true }) {
       HTMLAttributes: { class: 'text-2xl font-semibold' },
     }),
     BulletList.configure({
-      HTMLAttributes: { class: 'list-disc list-inside' },
+      HTMLAttributes: { class: 'list-disc list-outside pl-5 my-2' },
     }),
     OrderedList.configure({
-      HTMLAttributes: { class: 'list-decimal list-inside' },
+      HTMLAttributes: { class: 'list-decimal list-outside pl-5 my-2' },
     }),
     ListItem,
     Underline,

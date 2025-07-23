@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:ital,wght@0,400;0,500;0,700;0,800;1,400;1,500;1,700;1,800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -91,7 +91,6 @@ div.page{
 
 em {
   font-style: italic;
-  font-family: 'Manrope', 'Noto Sans', sans-serif;
 }
 
 h2 {
@@ -99,12 +98,10 @@ h2 {
   font-weight: 600;  /* font-semibold */
 }
 
-ul {
-  list-style-type: disc; /* list-disc */
-  list-style-position: inside; /* list-inside */
-}
-
-ol {
-  list-style-type: decimal; /* list-decimal */
-  list-style-position: inside; /* list-inside */
+/* listas com recuo fora do marcador */
+.editor-content ul,
+.editor-content ol {
+  margin: 1em 0;
+  padding-left: 1.25rem;    /* pl-5 */
+  list-style-position: outside;
 }
