@@ -4,6 +4,10 @@ import PropTypes from 'prop-types';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from './Underline';
 import PaginationExtension, { PageNode, HeaderFooterNode, BodyNode } from 'tiptap-extension-pagination';
+import logo from '../assets/logo1.png'
+import save from '../assets/save.png'
+import undo from '../assets/undo.png'
+import redo from '../assets/redo.png'
 
 const pageStyle = { fontFamily: 'Manrope, "Noto Sans", sans-serif' };
 const avatarStyle = {
@@ -51,19 +55,17 @@ function Editor({ content, setContent, editable = true }) {
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#625DF5] to-transparent p-6">
         <header className="w-full max-w-4xl flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 bg-transparent px-6 py-3 shadow-sm mb-6 rounded-t-xl">
           <div className="flex items-center gap-3 text-white">
-            <div className="size-6 text-white">
-              <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z"
-                  fill="currentColor"
-                />
-              </svg>
+            <div className="inline-flex items-center justify-center bg-white rounded-full p-2">
+              <img
+                src={logo}
+                alt="Logo"
+                className="w-20 h-20"
+                style={{ fontFamily: 'Manrope, "Noto Sans", sans-serif' }}
+              />
             </div>
-            <h1 className="text-white text-xl font-bold leading-tight tracking-tight">
-              CodeCollab
-            </h1>
-          </div>
 
+            <h1 className="text-2xl font-bold tracking-tight">Next_Page</h1>
+          </div>
           <div className="flex flex-1 items-center justify-end gap-6 relative">
             {/* Menu colapsável para desktop */}
             <div className="hidden md:block relative">
@@ -84,9 +86,8 @@ function Editor({ content, setContent, editable = true }) {
               </button>
 
               <div
-                className={`absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-md z-50 transition-all duration-300 origin-top-right ${
-                  isCollapseOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'
-                }`}
+                className={`absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-md z-50 transition-all duration-300 origin-top-right ${isCollapseOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0 pointer-events-none'
+                  }`}
               >
                 <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">File</a>
                 <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit</a>
@@ -102,20 +103,29 @@ function Editor({ content, setContent, editable = true }) {
               <button
                 onClick={() => editor && editor.commands.undo()}
                 className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
-              >
-                <span className="material-icons text-xl">undo</span>
+              > <img
+              src={undo}
+              alt="undo"
+              className="w-5 h-5"
+            />
               </button>
               <button
                 onClick={() => editor && editor.commands.redo()}
                 className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
-              >
-                <span className="material-icons text-xl">redo</span>
+              > <img
+              src={redo}
+              alt="redo"
+              className="w-5 h-5"
+            />
               </button>
               <button
-                onClick={() => editor && console.log(editor.getHTML())}
-                className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
-              >
-                <span className="material-icons text-xl">save</span>
+                onClick={() => editor && console.log(editor.getHTML())}   
+                className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"           >
+                <img
+                src={save}
+                alt="save"
+                className="w-5 h-5"
+              />
               </button>
             </div>
 
@@ -145,9 +155,8 @@ function Editor({ content, setContent, editable = true }) {
 
         {/* Menu lateral mobile */}
         <div
-          className={`fixed inset-y-0 right-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
-            isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-          } md:hidden`}
+          className={`fixed inset-y-0 right-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+            } md:hidden`}
         >
           <nav className="flex flex-col p-6 w-full">
             <button
@@ -179,11 +188,10 @@ function Editor({ content, setContent, editable = true }) {
                 <button
                   key={action}
                   onClick={() => editor && editor.chain().focus()[`toggle${action.charAt(0).toUpperCase() + action.slice(1)}`]().run()}
-                  className={`p-2 rounded-md ${
-                    editor?.isActive(action)
+                  className={`p-2 rounded-md ${editor?.isActive(action)
                       ? 'bg-slate-200 text-slate-800'
                       : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
-                  } transition-colors`}
+                    } transition-colors`}
                 >
                   <span className={label.toLowerCase()}>{label}</span>
                 </button>
@@ -191,25 +199,22 @@ function Editor({ content, setContent, editable = true }) {
               <div className="h-5 w-px bg-slate-300 mx-1"></div>
               <button
                 onClick={() => editor && editor.chain().focus().toggleHeading({ level: 2 }).run()}
-                className={`p-2 rounded-md ${
-                  editor?.isActive('heading', { level: 2 }) ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
-                } transition-colors`}
+                className={`p-2 rounded-md ${editor?.isActive('heading', { level: 2 }) ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
+                  } transition-colors`}
               >
                 <span className="font-bold">H2</span>
               </button>
               <button
                 onClick={() => editor && editor.chain().focus().toggleBulletList().run()}
-                className={`p-2 rounded-md ${
-                  editor?.isActive('bulletList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
-                } transition-colors`}
+                className={`p-2 rounded-md ${editor?.isActive('bulletList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
+                  } transition-colors`}
               >
                 <span>&bull;</span>
               </button>
               <button
                 onClick={() => editor && editor.chain().focus().toggleOrderedList().run()}
-                className={`p-2 rounded-md ${
-                  editor?.isActive('orderedList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
-                } transition-colors`}
+                className={`p-2 rounded-md ${editor?.isActive('orderedList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
+                  } transition-colors`}
               >
                 <span>1.</span>
               </button>
