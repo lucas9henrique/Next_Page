@@ -17,9 +17,19 @@ function Projects() {
           'Authorization': `Bearer ${token}`,
         }
       })
-      .then(res => res.json())
-      .then(data => setProjects(data))
-      .catch(console.error)
+      .then(async res => {
+        if (!res.ok) return []
+        try {
+          return await res.json()
+        } catch {
+          return []
+        }
+      })
+      .then(data => {
+        if (Array.isArray(data)) setProjects(data)
+        else setProjects([])
+      })
+      .catch(() => setProjects([]))
   }, [])
   return (
     <div className="bg-slate-50 min-h-screen">
@@ -93,7 +103,7 @@ function Projects() {
                     {projects.length === 0 && (
                       <tr>
                         <td colSpan={4} className="px-6 py-4 text-center text-sm text-slate-500">
-                          No projects found.
+                          Não foram encontrados projetos anteriores.
                         </td>
                       </tr>
                     )}
