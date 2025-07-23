@@ -66,6 +66,33 @@ function Editor({editable = true }) {
         body: JSON.stringify({ content }),
       })
   }, [content, id])
+
+  const handleAction = (type) => {
+    if (!editor) return
+    const chain = editor.chain().focus()
+    switch (type) {
+      case 'bold':
+        chain.toggleBold().run()
+        break
+      case 'italic':
+        chain.toggleItalic().run()
+        break
+      case 'underline':
+        chain.toggleUnderline().run()
+        break
+      case 'heading2':
+        chain.toggleHeading({ level: 2 }).run()
+        break
+      case 'bulletList':
+        chain.toggleBulletList().run()
+        break
+      case 'orderedList':
+        chain.toggleOrderedList().run()
+        break
+      default:
+        break
+    }
+  }
   return (
     <div className="bg-slate-100" style={pageStyle}>
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#625DF5] to-transparent p-6">
@@ -133,7 +160,7 @@ function Editor({editable = true }) {
               ].map(({ label, action }) => (
                 <button
                   key={action}
-                  onClick={() => editor && editor.chain().focus()[`toggle${action.charAt(0).toUpperCase() + action.slice(1)}`]().run()}
+                  onClick={() => handleAction(action)}
                   className={`p-2 rounded-md ${editor?.isActive(action)
                       ? 'bg-slate-200 text-slate-800'
                       : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
@@ -144,21 +171,21 @@ function Editor({editable = true }) {
               ))}
               <div className="h-5 w-px bg-slate-300 mx-1"></div>
               <button
-                onClick={() => editor && editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                onClick={() => handleAction('heading2')}
                 className={`p-2 rounded-md ${editor?.isActive('heading', { level: 2 }) ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
                   } transition-colors`}
               >
                 <span className="font-bold">H2</span>
               </button>
               <button
-                onClick={() => editor && editor.chain().focus().toggleBulletList().run()}
+                onClick={() => handleAction('bulletList')}
                 className={`p-2 rounded-md ${editor?.isActive('bulletList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
                   } transition-colors`}
               >
                 <span>&bull;</span>
               </button>
               <button
-                onClick={() => editor && editor.chain().focus().toggleOrderedList().run()}
+                onClick={() => handleAction('orderedList')}
                 className={`p-2 rounded-md ${editor?.isActive('orderedList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
                   } transition-colors`}
               >
