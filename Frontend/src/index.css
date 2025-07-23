@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -40,12 +42,12 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  /*background-color: #1a1a1a;*/
   cursor: pointer;
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: white;
 }
 button:focus,
 button:focus-visible {
@@ -85,4 +87,21 @@ div.page{
 .page {
   margin: 24px auto !important;
   padding: 0 !important;
+}
+
+em {
+  font-style: italic;
+}
+
+h2 {
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: 600;  /* font-semibold */
+}
+
+/* listas com recuo fora do marcador */
+.editor-content ul,
+.editor-content ol {
+  margin: 1em 0;
+  padding-left: 1.25rem;    /* pl-5 */
+  list-style-position: outside;
 }

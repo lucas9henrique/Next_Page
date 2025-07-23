@@ -29,8 +29,7 @@ function Login() {
         }
       } else {
         setError('')
-        alert('Login successful!')
-        navigate('/editor')
+        navigate('/projects')
       }
     } catch (err) {
       setError('Network error')

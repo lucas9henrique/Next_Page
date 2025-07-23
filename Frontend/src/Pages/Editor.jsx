@@ -1,165 +1,329 @@
+import { useState, useEffect } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
-import PropTypes from 'prop-types';
+import TextAlign from '@tiptap/extension-text-align'
+import { useParams } from 'react-router-dom'
 import StarterKit from '@tiptap/starter-kit'
+import Italic from '@tiptap/extension-italic'
+import Heading from '@tiptap/extension-heading'
+import BulletList from '@tiptap/extension-bullet-list'
+import OrderedList from '@tiptap/extension-ordered-list'
+import ListItem from '@tiptap/extension-list-item'
 import Underline from './Underline'
 import PaginationExtension, { PageNode, HeaderFooterNode, BodyNode } from "tiptap-extension-pagination";
+import logo from '../assets/logo1.png'
+import save from '../assets/save.png'
+import undo from '../assets/undo.png'
+import redo from '../assets/redo.png'
+import center_align from '../assets/center-align.png'
+import left_align from '../assets/left-align.png'
+import right_align from '../assets/right-align.png'
+import just_align from '../assets/justification.png'
+import underline_font from '../assets/underline.png'
+import bold_font from '../assets/bold.png'
+import italic_font from '../assets/italic.png'
+import loaderGif from '../assets/loader.gif'
+import cloudIcon from '../assets/cloud.png'
+import cloudOffIcon from '../assets/cloud-off.png'
 
-const pageStyle = { fontFamily: 'Manrope, "Noto Sans", sans-serif' };
+const pageStyle = { fontFamily: '"Roboto", "Noto Sans", sans-serif' };
 const avatarStyle = {
   backgroundImage:
     'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDm3TJQ2bsuTFWymc2Zk_ul_UFNWm9sNykIz-NMHhL0PoS12Fi486mWOZAn3_x22WDH8S0e4rhwVEmLCTpnn9njxyHcw1I_XeGkUReoLJH4uU6tSBqiAHt9mt0NycVBgx6EjInl8KMxpeLk83j0Y_FpT2REm6zfpNrhd_kVJvxKm2NU8HqgCSs0y84v--Shy1_kE_ZEqg1e8a22HZDG4b8vqbjg12BnuFRUk1gaNbl5ySWLhWKtgGNSnf6NVQhfHyjeDroohmI8BH5_")',
 };
 
-function Editor({ content, setContent, editable = true }) {
+const alignButtons = [
+  { img: left_align, alt: 'Alinhar à esquerda', action: 'alignLeft' },
+  { img: center_align, alt: 'Centralizar texto', action: 'alignCenter' },
+  { img: right_align, alt: 'Alinhar à direita', action: 'alignRight' },
+  { img: just_align, alt: 'Justificar texto', action: 'alignJustify' },]
+
+const styleButtons = [
+  { img: bold_font, alt: 'Negrito', action: 'bold' },
+  { img: italic_font, alt: 'Itálico', action: 'italic' },
+  { img: underline_font, alt: 'Sublinhar', action: 'underline' },
+]
+
+function Editor({ editable = true }) {
+  const { id } = useParams()
+  const [content, setContent] = useState('')
+  const [saveStatus, setSaveStatus] = useState('idle')
+
   /* extensões que o Tiptap deve carregar */
   const extensions = [
-    StarterKit,
+    StarterKit.configure({
+      italic: false,
+      heading: false,
+      bulletList: false,
+      orderedList: false,
+      listItem: false,
+    }),
+    Italic.configure({
+      HTMLAttributes: { class: 'italic' },
+    }),
+    Heading.configure({
+      levels: [1, 2, 3],
+      HTMLAttributes: { class: 'text-2xl font-semibold' },
+    }),
+    BulletList.configure({
+      HTMLAttributes: { class: 'list-disc list-outside pl-5 my-2' },
+    }),
+    OrderedList.configure({
+      HTMLAttributes: { class: 'list-decimal list-outside pl-5 my-2' },
+    }),
+    ListItem,
     Underline,
     PaginationExtension.configure({
       pageAmendmentOptions: {
         enableHeader: false,
         enableFooter: false,
-    },
-    BorderConfig:{ top: 0, right: 0, bottom: 0, left: 0 },
+      },
+      BorderConfig: { top: 0, right: 0, bottom: 0, left: 0 },
+    }),
+    TextAlign.configure({
+      types: ['paragraph', 'heading'],
     }),
     PageNode,
     HeaderFooterNode,
     BodyNode,
   ];
-const editor = useEditor({
+
+  const editor = useEditor({
     extensions,
     content,
     editable,
     onUpdate({ editor }) {
-      setContent(editor.getHTML());          // devolve o HTML atualizado
+      setContent(editor.getHTML())
     },
-    onSelectionUpdate({ editor }) {
-      const { $from, $to } = editor.state.selection;
-      console.log('Selection updated:', $from.pos, $to.pos);
-    },
-  });
+  })
+
+  useEffect(() => {
+    fetch(`http://localhost:8000/api/load/${id}`)
+      .then((res) => res.ok ? res.json() : Promise.reject(res))
+      .then((data) => {
+        const html = data.content || ''
+        setContent(html)
+        if (editor) {
+          editor.commands.setContent(html)
+        }
+      })
+      .catch(() => { })
+  }, [id, editor])
+
+  useEffect(() => {
+    if (!id) return
+    setSaveStatus('saving')
+    fetch(`http://localhost:8000/api/save/${id}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content }),
+      })
+      .then(res => {
+        if (!res.ok) throw new Error('save failed')
+        setSaveStatus('saved')
+      })
+      .catch(() => {
+        setSaveStatus('error')
+      })
+  }, [content, id])
+
+  const handleAction = (type) => {
+    if (!editor) return
+    const chain = editor.chain().focus()
+    switch (type) {
+      case 'bold':
+        chain.toggleBold().run()
+        break
+      case 'italic':
+        chain.toggleItalic().run()
+        break
+      case 'underline':
+        chain.toggleUnderline().run()
+        break
+      case 'heading2':
+        chain.toggleHeading({ level: 2 }).run()
+        break
+      case 'bulletList':
+        chain.toggleBulletList().run()
+        break
+      case 'orderedList':
+        chain.toggleOrderedList().run()
+        break
+      case 'alignLeft':
+        chain.setTextAlign('left').run()
+        break
+      case 'alignCenter':
+        chain.setTextAlign('center').run()
+        break
+      case 'alignRight':
+        chain.setTextAlign('right').run()
+        break
+      case 'alignJustify':
+        chain.setTextAlign('justify').run()
+        break
+      default:
+        break
+    }
+  }
   return (
-    <div
-      className="relative flex size-full min-h-screen flex-col bg-gradient-to-b from-[#625DF5] to-transparent group/design-root overflow-x-hidden"
-      style={pageStyle}
-    >
-      <div className="layout-container flex h-full grow flex-col">
-        <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 bg-transparent px-6 py-3 shadow-sm">
+    <div className="bg-slate-100" style={pageStyle}>
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#625DF5] to-transparent p-6">
+        <header className="w-full max-w-4xl flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 bg-transparent px-6 py-3 shadow-sm mb-6 rounded-t-xl">
           <div className="flex items-center gap-3 text-white">
-            <div className="size-6 text-white">
-              <svg
-                fill="none"
-                viewBox="0 0 48 48"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M24 45.8096C19.6865 45.8096 15.4698 44.5305 11.8832 42.134C8.29667 39.7376 5.50128 36.3314 3.85056 32.3462C2.19985 28.361 1.76794 23.9758 2.60947 19.7452C3.451 15.5145 5.52816 11.6284 8.57829 8.5783C11.6284 5.52817 15.5145 3.45101 19.7452 2.60948C23.9758 1.76795 28.361 2.19986 32.3462 3.85057C36.3314 5.50129 39.7376 8.29668 42.134 11.8833C44.5305 15.4698 45.8096 19.6865 45.8096 24L24 24L24 45.8096Z"
-                  fill="currentColor"
-                />
-              </svg>
+            <div className="inline-flex items-center justify-center bg-white rounded-full p-2">
+              <img
+                src={logo}
+                alt="Logo"
+                className="w-20 h-20"
+                style={{ fontFamily: 'Manrope, "Noto Sans", sans-serif' }}
+              />
             </div>
-            <h1 className="text-white text-xl font-bold leading-tight tracking-tight">
-              CodeCollab
-            </h1>
+
+            <h1 className="text-2xl font-bold tracking-tight">Next_Page</h1>
           </div>
-          <div className="flex flex-1 items-center justify-end gap-6">
-            <nav className="flex items-center gap-6 text-sm font-medium text-white">
-              <a
-                className="hover:text-[#82F0FA] black"
-                href="#"
-              >
-                File
-              </a>
-            </nav>
+          <div className="flex flex-1 items-center justify-end gap-6 relative">
+            {/* Botões de ação */}
             <div className="flex items-center gap-2">
               <button
                 onClick={() => editor && editor.commands.undo()}
                 className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
-              >
-                <span className="material-icons text-xl">undo</span>
+              > <img
+                  src={undo}
+                  alt="undo"
+                  className="w-5 h-5"
+                />
               </button>
               <button
                 onClick={() => editor && editor.commands.redo()}
                 className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
-              >
-                <span className="material-icons text-xl">redo</span>
+              > <img
+                  src={redo}
+                  alt="redo"
+                  className="w-5 h-5"
+                />
               </button>
               <button
                 onClick={() => editor && console.log(editor.getHTML())}
-                className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
-              >
-                <span className="material-icons text-xl">save</span>
+                className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"           >
+                <img
+                  src={save}
+                  alt="save"
+                  className="w-5 h-5"
+                />
               </button>
             </div>
+
+            {/* Avatar */}
             <div
               className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9 border-2 border-white shadow-sm"
               style={avatarStyle}
             ></div>
           </div>
         </header>
-
-
-        <main className="flex flex-1 p-0">
-          <div className="w-full">
-            <div className="bg-white shadow-xl rounded-lg overflow-hidden">
-              <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-2 bg-slate-50">
-                <div className="flex items-center gap-1">
+        {/* Editor */}
+        <div className="w-full max-w-4xl rounded-xl bg-white p-8 shadow-2xl flex flex-col min-h-[60vh]">
+          <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-2 bg-slate-50 rounded-t-lg -mx-8 -mt-8 mb-4">
+            <div className="flex items-center gap-1">
+              {/* Botões de fonte */}
+              {styleButtons.map(({ img, alt, action }) => (
+                <button
+                  key={action}
+                  onClick={() => handleAction(action)}
+                  className={`
+        p-2 rounded-md transition-colors
+        ${editor?.isActive(action)
+                      ? 'bg-slate-200'
+                      : 'hover:bg-slate-200'}`}>
+                  <img src={img} alt={alt} className="w-4 h-4" />
+                </button>
+              ))}
+              {/* Botões de texto */}
+              <div className="h-5 w-px bg-slate-300 mx-1"></div>
+              <button
+                onClick={() => handleAction('heading2')}
+                className={`p-2 rounded-md ${editor?.isActive('heading', { level: 2 }) ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
+                  } transition-colors`}
+              >
+                <span className="font-bold">H2</span>
+              </button>
+              <button
+                onClick={() => handleAction('bulletList')}
+                className={`p-2 rounded-md ${editor?.isActive('bulletList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
+                  } transition-colors`}
+              >
+                <span>&bull;</span>
+              </button>
+              <button
+                onClick={() => handleAction('orderedList')}
+                className={`p-2 rounded-md ${editor?.isActive('orderedList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
+                  } transition-colors`}
+              >
+                <span>1.</span>
+              </button>
+              <div className="h-5 w-px bg-slate-300 mx-1"></div>
+              <div className="flex items-center gap-2">
+                {alignButtons.map(({ img, alt, action }) => (
                   <button
-                    onClick={() => editor && editor.chain().focus().toggleBold().run()}
-                    className={`p-2 rounded-md ${editor?.isActive('bold') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
+                    key={action}
+                    onClick={() => handleAction(action)}
+                    className={`
+          p-2 rounded-md transition-colors
+          ${editor?.isActive({ textAlign: action.replace('align', '').toLowerCase() })
+                        ? 'bg-slate-200'
+                        : 'hover:bg-slate-200'
+                      } `}
                   >
-                    <span className="font-bold">B</span>
+                    <img src={img} alt={alt} className="w-5 h-5" />
                   </button>
-                  <button
-                    onClick={() => editor && editor.chain().focus().toggleItalic().run()}
-                    className={`p-2 rounded-md ${editor?.isActive('italic') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
-                  >
-                    <span className="italic">I</span>
-                  </button>
-                  <button
-                    onClick={() => editor && editor.chain().focus().toggleUnderline().run()}
-                    className={`p-2 rounded-md ${editor?.isActive('underline') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
-                  >
-                    <span className="underline">U</span>
-                  </button>
-                  <div className="h-5 w-px bg-slate-300 mx-1"></div>
-                  <button
-                    onClick={() => editor && editor.chain().focus().toggleHeading({ level: 2 }).run()}
-                    className={`p-2 rounded-md ${editor?.isActive('heading', { level: 2 }) ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
-                  >
-                    <span className="font-bold">H2</span>
-                  </button>
-                  <button
-                    onClick={() => editor && editor.chain().focus().toggleBulletList().run()}
-                    className={`p-2 rounded-md ${editor?.isActive('bulletList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
-                  >
-                    <span>&bull;</span>
-                  </button>
-                  <button
-                    onClick={() => editor && editor.chain().focus().toggleOrderedList().run()}
-                    className={`p-2 rounded-md ${editor?.isActive('orderedList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'} transition-colors`}
-                  >
-                    <span>1.</span>
-                  </button>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-slate-500">
-                  <span className="material-icons text-base text-green-500">
-                    cloud_done
-                  </span>
-                  <span>Saved</span>
-                </div>
+                ))}
               </div>
-              <EditorContent editor={editor} className="w-full h-full outline-none text-black"/>
             </div>
+            {/* salvamento */}
+            <div className="flex items-center gap-2 text-sm">
+              {saveStatus === 'saving' && (
+                <img src={loaderGif} alt="Salvando..." className="w-5 h-5 animate-spin" />
+              )}
+              {saveStatus === 'saved' && (
+                <>
+                  <img
+                    src={cloudIcon}
+                    alt="Salvo"
+                    className="w-5 h-5"
+                  />
+                  <span className="text-green-400">Salvo</span>
+                </>
+              )}
+              {saveStatus === 'error' && (
+                <>
+                  <img
+                    src={cloudOffIcon}
+                    alt="Erro ao salvar"
+                    className="w-5 h-5"
+                  />
+                  <span className="text-red-400">Erro ao salvar</span>
+                </>
+              )}
+              {saveStatus === 'idle' && (
+                <img
+                  src={cloudIcon}
+                  alt="Pronto"
+                  className="w-5 h-5 text-gray-400"
+                />
+              )}
+            </div>
+
+            {/* editor de texto */}
           </div>
-        </main>
+          <EditorContent editor={editor} className="w-full h-full outline-none text-black flex-grow p-10" />
+        </div>
+
+        {/* Rodapé */}
+        <footer className="mt-10 text-center text-sm text-slate-400">
+          <p>© 2025 CodeCollab. All rights reserved.</p>
+        </footer>
       </div>
     </div>
-  )
+  );
 }
-Editor.propTypes = {
-  content: PropTypes.string.isRequired,
-  setContent: PropTypes.func.isRequired,
-  editable: PropTypes.bool,
-};
 export default Editor;
+
