@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:ital,wght@0,400;0,500;0,700;0,800;1,400;1,500;1,700;1,800&display=swap');
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -85,4 +87,24 @@ div.page{
 .page {
   margin: 24px auto !important;
   padding: 0 !important;
+}
+
+em {
+  font-style: italic;
+  font-family: 'Manrope', 'Noto Sans', sans-serif;
+}
+
+h2 {
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: 600;  /* font-semibold */
+}
+
+ul {
+  list-style-type: disc; /* list-disc */
+  list-style-position: inside; /* list-inside */
+}
+
+ol {
+  list-style-type: decimal; /* list-decimal */
+  list-style-position: inside; /* list-inside */
 }
