@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import TextAlign from '@tiptap/extension-text-align'
 import { useParams } from 'react-router-dom'
@@ -9,6 +9,7 @@ import BulletList from '@tiptap/extension-bullet-list'
 import OrderedList from '@tiptap/extension-ordered-list'
 import ListItem from '@tiptap/extension-list-item'
 import Underline from './Underline'
+import { UserContext } from './UserContext.jsx'
 import PaginationExtension, { PageNode, HeaderFooterNode, BodyNode } from "tiptap-extension-pagination";
 // Imagens
 // — Geral
@@ -52,6 +53,7 @@ function Editor({ editable = true }) {
   const { id } = useParams()
   const [content, setContent] = useState('')
   const [saveStatus, setSaveStatus] = useState('idle')
+  const { userId, token } = useContext(UserContext)
 
   /* extensões que o Tiptap deve carregar */
   const extensions = [
@@ -102,7 +104,11 @@ function Editor({ editable = true }) {
   })
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/load/${id}`)
+    fetch(`http://localhost:8000/api/load/${id}`,
+      {headers:{
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+    }})
       .then((res) => res.ok ? res.json() : Promise.reject(res))
       .then((data) => {
         const html = data.content || ''
@@ -120,7 +126,9 @@ function Editor({ editable = true }) {
     fetch(`http://localhost:8000/api/save/${id}`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json',
+                   'Authorization': `Bearer ${token}`,
+         },
         body: JSON.stringify({ content }),
       })
       .then(res => {

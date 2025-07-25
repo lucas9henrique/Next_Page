@@ -45,15 +45,16 @@ export default function Projects() {
   }, [menuOpen])
 
   const handleCreate = () => {
-    fetch('http://localhost:8000/documents', {
+    fetch('http://localhost:8000/api/documents', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: 'Untitled' }),
+      headers: { 'Content-Type': 'application/json',
+                 'Authorization': `Bearer ${token}`},
+      body: JSON.stringify({ name: 'Untitled' }),
     })
       .then(res => (res.ok ? res.json() : Promise.reject(res)))
       .then(data => {
         setMenuOpen(false)
-        navigate(`/editor/${data.id}`)
+        navigate(`/editor/${data.codigo}`)
       })
       .catch(() => setMenuOpen(false))
   }
@@ -65,7 +66,6 @@ export default function Projects() {
       navigate(`/editor/${shareCode.trim()}`)
     }
   }
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#625DF5] to-transparent">
       {/* HEADER FIXO */}
@@ -155,26 +155,28 @@ export default function Projects() {
               <tbody className="bg-white divide-y divide-slate-200">
                 {projects.length > 0 ? (
                   projects.map(proj => (
-                    <tr key={proj.id}>
+                    <tr key={proj.codigo}>
                       <td className="px-6 py-4 text-sm font-medium text-slate-900">
-                        {proj.name}
+                        {proj.nomeProjeto}
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-600">
-                        {proj.last_modified}
+                      {new Date(proj.ultimaModificacao + 'Z').toLocaleString('pt-BR', {
+                          timeZone: 'America/Sao_Paulo',
+                        })}
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${proj.main_branch === 'main'
+                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${(proj.branches?.[0] || '') === 'main'
                               ? 'bg-green-100 text-green-800'
                               : 'bg-blue-100 text-blue-800'
                             }`}
                         >
-                          {proj.main_branch}
+                          {proj.branches?.[0] || ''}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm font-medium">
                         <div className="flex gap-2">
-                          <button className="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200">
+                          <button className="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200" onClick={() => navigate(`/editor/${proj.codigo}`)}>                        
                             Edit
                           </button>
                           <button className="rounded-md bg-red-100 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-200">
