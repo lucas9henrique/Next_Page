@@ -59,13 +59,28 @@ export default function Projects() {
       .catch(() => setMenuOpen(false))
   }
 
-  const handleJoin = e => {
-    e.preventDefault()
-    if (shareCode.trim()) {
-      setMenuOpen(false)
-      navigate(`/editor/${shareCode.trim()}`)
+  const handleJoin = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/documents/${shareCode.trim()}/add_user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ email: userId})
+      });
+  
+      if (!response.ok) {
+        throw new Error('Erro ao adicionar usuário');
+      }
+      else{
+      navigate(`/editor/${shareCode.trim()}`);
+      }
+    } catch (err) {
+      console.error('Erro ao adicionar usuário:', err);
+      alert('Não foi possível adicionar o usuário.');
     }
-  }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#625DF5] to-transparent">
       {/* HEADER FIXO */}

@@ -3,6 +3,12 @@ import uuid
 import sqlite3
 import hashlib
 from datetime import datetime, timedelta
+from pathlib import Path   
+from git import Repo, Actor
+from git.exc import GitCommandError
+from pathlib import Path
+from collections import defaultdict
+import asyncio
 
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,13 +19,15 @@ from git import Repo, Actor
 
 from db import get_mongo, MongoDB, Project
 
+repo_locks: dict[str, asyncio.Lock] = defaultdict(asyncio.Lock)
+
 def remove_git_lock(path: str):
     lock_path = os.path.join(path, ".git", "index.lock")
     if os.path.exists(lock_path):
         try:
             os.remove(lock_path)
         except PermissionError:
-            print(f"⚠️ Não foi possível remover {lock_path} porque está em uso.")
+            print(f"Não foi possível remover {lock_path} porque está em uso.")
 
 app = FastAPI()
 app.add_middleware(
@@ -120,12 +128,24 @@ def create_document(
     mongo: MongoDB = Depends(get_mongo),
     email: str = Depends(verify_token),
 ):
+    # gera o código do projeto
     seq = mongo.next_sequence()
     code = f"{seq:03d}{uuid.uuid4().hex[:3].upper()}"
-    # cria repositório Git local
+
+    # cria o repositório local já com a branch “main”
     repo_path = os.path.join(REPOS_ROOT, code)
     os.makedirs(repo_path, exist_ok=True)
-    Repo.init(repo_path)
+    repo = Repo.init(repo_path, initial_branch="main")   # importante!
+
+    # cria o arquivo de trabalho vazio + commit inicial
+    file_path = Path(repo_path) / "document.txt"
+    file_path.touch()               # apenas cria o arquivo
+    repo.index.add(["document.txt"])
+    actor = Actor(email, email)     # autor/committer = usuário dono
+    repo.index.commit("Initial commit",
+                      author=actor,
+                      committer=actor)
+
     # cria registro no Mongo
     project = Project(nomeProjeto=doc.name, codigo=code, donos=[email])
     mongo.insert_project(project)
@@ -154,7 +174,7 @@ def list_documents(
 
 @app.post("/api/documents/{codigo}/add_user")
 def add_user_to_document(
-    codigo: str,
+    codigo: str, 
     new_user: UserEmail,
     mongo: MongoDB = Depends(get_mongo),
     email: str = Depends(verify_token),
@@ -212,7 +232,7 @@ def merge_branches(
     return {"msg": "Merge completed"}
 
 @app.post("/api/save/{document}")
-def save_document(
+async def save_document(
     document: str,
     data: DocumentData,
     mongo: MongoDB = Depends(get_mongo),
@@ -221,20 +241,34 @@ def save_document(
     proj = mongo.get_project(document)
     if not proj or email not in proj["donos"]:
         raise HTTPException(404, "Document not found")
+    
     path = os.path.join(REPOS_ROOT, document)
     remove_git_lock(path)
+
     branch = data.branch or "main"
     repo = Repo(path)
-    if branch in repo.heads:
-        repo.git.checkout(branch)
-    else:
-        repo.git.checkout("-b", branch)
-    file_path = os.path.join(path, "document.txt")
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.write(data.content)
-    repo.index.add(["document.txt"])
-    actor = Actor(email, email)
-    repo.index.commit(data.message or "Update", author=actor, committer=actor)
+
+    async with repo_locks[document]:           
+        # Troca de branch só se necessário
+        if repo.head.is_valid() and repo.active_branch.name != branch:
+            try:
+                repo.git.checkout(branch)
+            except GitCommandError:
+                # Geralmente apenas “document.txt” não rastreado – força a troca
+                repo.git.checkout(branch, force=True)
+        elif branch not in repo.heads:
+            repo.git.checkout("-b", branch)     # cria a nova branch
+
+        # Escreve e commita se houver mudanças
+        file_path = Path(path) / "document.txt"
+        file_path.write_text(data.content, encoding="utf-8")
+
+        if repo.is_dirty(untracked_files=True):
+            repo.index.add(["document.txt"])
+            actor = Actor(email, email)
+            repo.index.commit(data.message or "Update",
+                              author=actor, committer=actor)
+
     # atualiza Mongo
     mongo.update_project(document, {"Texto": data.content})
     return {"msg": "Document saved"}
