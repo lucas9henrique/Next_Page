@@ -59,7 +59,8 @@ export default function Projects() {
       .catch(() => setMenuOpen(false))
   }
 
-  const handleJoin = async () => {
+  const handleJoin = async (e) => {
+    e.preventDefault();
     try {
       const response = await fetch(`http://localhost:8000/api/documents/${shareCode.trim()}/add_user`, {
         method: 'POST',
@@ -117,6 +118,7 @@ export default function Projects() {
                 >
                   Create New Document
                 </button>
+
                 <form onSubmit={handleJoin} className="flex gap-2">
                   <input
                     type="text"
@@ -134,6 +136,7 @@ export default function Projects() {
                 </form>
               </div>
             )}
+            
             <div
               className="w-10 h-10 rounded-full bg-cover bg-center border"
               style={{
