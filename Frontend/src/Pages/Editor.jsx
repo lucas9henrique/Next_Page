@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext, useCallback } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import TextAlign from '@tiptap/extension-text-align'
 import { useParams } from 'react-router-dom'
@@ -120,15 +120,16 @@ function Editor({ editable = true }) {
       .catch(() => { })
   }, [id, editor])
 
-  useEffect(() => {
+  const saveContent = useCallback(() => {
     if (!id) return
     setSaveStatus('saving')
-    fetch(`http://localhost:8000/api/save/${id}`,
+    return fetch(`http://localhost:8000/api/save/${id}`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json',
-                   'Authorization': `Bearer ${token}`,
-         },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify({ content }),
       })
       .then(res => {
@@ -138,7 +139,14 @@ function Editor({ editable = true }) {
       .catch(() => {
         setSaveStatus('error')
       })
-  }, [content, id])
+  }, [content, id, token])
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      saveContent()
+    }, 1000)
+    return () => clearTimeout(handler)
+  }, [content, saveContent])
 
   const handleAction = (type) => {
     if (!editor) return
@@ -216,7 +224,7 @@ function Editor({ editable = true }) {
                 />
               </button>
               <button
-                onClick={() => editor && console.log(editor.getHTML())}
+                onClick={saveContent}
                 className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"           >
                 <img
                   src={save}
