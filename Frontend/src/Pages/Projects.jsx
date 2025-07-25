@@ -14,8 +14,8 @@ export default function Projects() {
 
   useEffect(() => {
     if (!userId) return
-
-    fetch(`http://localhost:8000/api/projects?user_id=${userId}`, {
+    //http://localhost:8000/api/projects?user_id=${userId}
+    fetch(`http://localhost:8000/api/documents`, {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
