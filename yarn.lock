@@ -7,10 +7,15 @@
   resolved "https://registry.npmjs.org/@remirror/core-constants/-/core-constants-3.0.0.tgz"
   integrity sha512-42aWfPrimMfDKDi4YegyS7x+/0tlzaqwPQCULLanv3DMIlu96KTJR0fM5isWX2UViOqlGnX6YFgqWepcX+XMNg==
 
-"@tiptap/core@^2.11.5":
+"@tiptap/core@^2.0.0", "@tiptap/core@^2.11.5":
   version "2.26.1"
   resolved "https://registry.npmjs.org/@tiptap/core/-/core-2.26.1.tgz"
   integrity sha512-fymyd/XZvYiHjBoLt1gxs024xP/LY26d43R1vluYq7AHBL/7DE3ywzy+1GEsGyAv5Je2L0KBhNIR/izbq3Kaqg==
+
+"@tiptap/extension-text-align@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.npmjs.org/@tiptap/extension-text-align/-/extension-text-align-2.0.1.tgz"
+  integrity sha512-XhMcx7qaReJlB5BeaXFQ+8QZED45/BRwCFqE+WkfwvWH1M/ySiiazOJyootDTudx0lijbf2rUCUKYc4oexoMew==
 
 "@tiptap/pm@^2.11.5", "@tiptap/pm@^2.7.0":
   version "2.26.1"

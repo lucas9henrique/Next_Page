@@ -40,7 +40,8 @@ const alignButtons = [
   { img: left_align, alt: 'Alinhar à esquerda', action: 'alignLeft' },
   { img: center_align, alt: 'Centralizar texto', action: 'alignCenter' },
   { img: right_align, alt: 'Alinhar à direita', action: 'alignRight' },
-  { img: just_align, alt: 'Justificar texto', action: 'alignJustify' },]
+  { img: just_align, alt: 'Justificar texto', action: 'alignJustify' },
+]
 
 const styleButtons = [
   { img: bold_font, alt: 'Negrito', action: 'bold' },
@@ -51,6 +52,7 @@ const styleButtons = [
 function Editor({ editable = true }) {
   const { id } = useParams()
   const [content, setContent] = useState('')
+  const [title, setTitle] = useState('Título do Documento')
   const [saveStatus, setSaveStatus] = useState('idle')
 
   /* extensões que o Tiptap deve carregar */
@@ -99,14 +101,16 @@ function Editor({ editable = true }) {
     onUpdate({ editor }) {
       setContent(editor.getHTML())
     },
-  })
+  });
 
   useEffect(() => {
     fetch(`http://localhost:8000/api/load/${id}`)
       .then((res) => res.ok ? res.json() : Promise.reject(res))
       .then((data) => {
         const html = data.content || ''
+        const loadedTitle = data.title || 'Título do Documento'
         setContent(html)
+        setTitle(loadedTitle)
         if (editor) {
           editor.commands.setContent(html)
         }
@@ -117,12 +121,11 @@ function Editor({ editable = true }) {
   useEffect(() => {
     if (!id) return
     setSaveStatus('saving')
-    fetch(`http://localhost:8000/api/save/${id}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content }),
-      })
+    fetch(`http://localhost:8000/api/save/${id}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content, title }),
+    })
       .then(res => {
         if (!res.ok) throw new Error('save failed')
         setSaveStatus('saved')
@@ -130,7 +133,7 @@ function Editor({ editable = true }) {
       .catch(() => {
         setSaveStatus('error')
       })
-  }, [content, id])
+  }, [content, title, id])
 
   const handleAction = (type) => {
     if (!editor) return
@@ -225,11 +228,13 @@ function Editor({ editable = true }) {
             ></div>
           </div>
         </header>
-        {/* Editor */}
+
+        {/* Editor principal */}
         <div className="w-full max-w-4xl rounded-xl bg-white p-8 shadow-2xl flex flex-col min-h-[60vh]">
+
+          {/* Barra de ferramentas */}
           <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-4 py-2 bg-slate-50 rounded-t-lg -mx-8 -mt-8 mb-4">
             <div className="flex items-center gap-1">
-              {/* Botões de fonte */}
               {styleButtons.map(({ img, alt, action }) => (
                 <button
                   key={action}
@@ -242,7 +247,6 @@ function Editor({ editable = true }) {
                   <img src={img} alt={alt} className="w-4 h-4" />
                 </button>
               ))}
-              {/* Botões de texto */}
               <div className="h-5 w-px bg-slate-300 mx-1"></div>
               <button
                 onClick={() => handleAction('heading2')}
@@ -316,9 +320,26 @@ function Editor({ editable = true }) {
                 />
               )}
             </div>
-
-            {/* editor de texto */}
           </div>
+
+          {/* Label para o título, um pouco acima do campo */}
+          <label
+            htmlFor="doc-title"
+            className="mb-1 text-lg font-semibold text-gray-700 select-none"
+          >
+            Título do Documento
+          </label>
+          {/* Caixa de texto para o título */}
+          <input
+            id="doc-title"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Digite o título do documento"
+            className="mb-6 text-3xl font-bold outline-none border-none w-full px-2 py-1 text-gray-800 placeholder-gray-400 bg-transparent"
+          />
+
+          {/* Editor de texto */}
           <EditorContent editor={editor} className="w-full h-full outline-none text-black flex-grow p-10" />
         </div>
 
@@ -330,5 +351,5 @@ function Editor({ editable = true }) {
     </div>
   );
 }
-export default Editor;
 
+export default Editor;

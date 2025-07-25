@@ -7,6 +7,8 @@ export default function Projects() {
   const [projects, setProjects] = useState([])
   const [menuOpen, setMenuOpen] = useState(false)
   const [shareCode, setShareCode] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
   const { userId, token } = useContext(UserContext)
   const navigate = useNavigate()
   const menuRef = useRef(null)
@@ -14,6 +16,7 @@ export default function Projects() {
 
   useEffect(() => {
     if (!userId) return
+    setIsLoading(true)
 
     fetch(`http://localhost:8000/api/projects?user_id=${userId}`, {
       headers: {
@@ -21,9 +24,10 @@ export default function Projects() {
         'Authorization': `Bearer ${token}`,
       },
     })
-      .then(res => (res.ok ? res.json() : []))
+      .then(res => res.ok ? res.json() : [])
       .then(data => setProjects(Array.isArray(data) ? data : []))
       .catch(() => setProjects([]))
+      .finally(() => setIsLoading(false))
   }, [userId, token])
 
   useEffect(() => {
@@ -55,7 +59,10 @@ export default function Projects() {
         setMenuOpen(false)
         navigate(`/editor/${data.id}`)
       })
-      .catch(() => setMenuOpen(false))
+      .catch(() => {
+        setMenuOpen(false)
+        alert('Erro ao criar projeto.')
+      })
   }
 
   const handleJoin = e => {
@@ -66,9 +73,34 @@ export default function Projects() {
     }
   }
 
+  const handleDelete = async (id) => {
+    if (!window.confirm('Tem certeza que deseja excluir este projeto?')) return
+
+    try {
+      const res = await fetch(`http://localhost:8000/api/projects/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+      if (res.ok) {
+        setProjects(prev => prev.filter(p => p.id !== id))
+      } else {
+        alert('Erro ao excluir projeto.')
+      }
+    } catch (error) {
+      alert('Erro ao excluir projeto.')
+    }
+  }
+
+  const filteredProjects = projects.filter(p =>
+    p.name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#625DF5] to-transparent">
-      {/* HEADER FIXO */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-[#625DF5] to-transparent border-b border-slate-200">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4 text-white">
@@ -82,6 +114,8 @@ export default function Projects() {
           <div className="flex items-center gap-4 relative">
             <input
               type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search in projects"
               className="w-64 rounded-lg border border-slate-200 px-4 py-2 text-sm"
             />
@@ -95,7 +129,7 @@ export default function Projects() {
             {menuOpen && (
               <div
                 ref={menuRef}
-                className="absolute right-0 top-12 z-80 w-164 rounded-md bg-white p-4 shadow-lg space-y-3">
+                className="absolute right-0 top-12 z-80 w-64 rounded-md bg-white p-4 shadow-lg space-y-3">
                 <button
                   onClick={handleCreate}
                   className="w-full rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-600"
@@ -129,8 +163,8 @@ export default function Projects() {
           </div>
         </div>
       </header>
-      {/* espaço para não sobrepor o header */}
-      <main className="pt-[68px] px-6">
+
+      <main className="pt-[72px] px-6">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-white text-3xl font-bold mt-10 mb-6">Your Projects</h1>
 
@@ -153,14 +187,20 @@ export default function Projects() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-slate-200">
-                {projects.length > 0 ? (
-                  projects.map(proj => (
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={4} className="px-6 py-4 text-center text-sm text-slate-500">
+                      Carregando projetos...
+                    </td>
+                  </tr>
+                ) : filteredProjects.length > 0 ? (
+                  filteredProjects.map(proj => (
                     <tr key={proj.id}>
                       <td className="px-6 py-4 text-sm font-medium text-slate-900">
                         {proj.name}
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-600">
-                        {proj.last_modified}
+                        {new Date(proj.last_modified).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4">
                         <span
@@ -174,10 +214,16 @@ export default function Projects() {
                       </td>
                       <td className="px-6 py-4 text-sm font-medium">
                         <div className="flex gap-2">
-                          <button className="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200">
+                          <button
+                            onClick={() => navigate(`/editor/${proj.id}`)}
+                            className="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200"
+                          >
                             Edit
                           </button>
-                          <button className="rounded-md bg-red-100 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-200">
+                          <button
+                            onClick={() => handleDelete(proj.id)}
+                            className="rounded-md bg-red-100 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-200"
+                          >
                             Delete
                           </button>
                         </div>
@@ -190,7 +236,7 @@ export default function Projects() {
                       colSpan={4}
                       className="px-6 py-4 text-center text-sm text-slate-500"
                     >
-                      Não foram encontrados projetos anteriores.
+                      Nenhum projeto encontrado.
                     </td>
                   </tr>
                 )}
