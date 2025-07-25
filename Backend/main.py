@@ -13,6 +13,14 @@ from git import Repo, Actor
 
 from db import get_mongo, MongoDB, Project
 
+def remove_git_lock(path: str):
+    lock_path = os.path.join(path, ".git", "index.lock")
+    if os.path.exists(lock_path):
+        try:
+            os.remove(lock_path)
+        except PermissionError:
+            print(f"⚠️ Não foi possível remover {lock_path} porque está em uso.")
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -214,6 +222,7 @@ def save_document(
     if not proj or email not in proj["donos"]:
         raise HTTPException(404, "Document not found")
     path = os.path.join(REPOS_ROOT, document)
+    remove_git_lock(path)
     branch = data.branch or "main"
     repo = Repo(path)
     if branch in repo.heads:
@@ -241,6 +250,7 @@ def load_document(
     if not proj or email not in proj["donos"]:
         raise HTTPException(404, "Document not found")
     path = os.path.join(REPOS_ROOT, document)
+    remove_git_lock(path)
     repo = Repo(path)
     ref = branch or "main"
     if ref in repo.heads:
