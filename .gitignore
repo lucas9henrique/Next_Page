@@ -28,3 +28,5 @@ dist-ssr
 *.db
 /Backend/__pycache__
 Backend/.env
+/Backend/__pycache__
+/Backend/repos
