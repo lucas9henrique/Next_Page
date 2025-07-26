@@ -236,7 +236,7 @@ function Editor({ editable = true }) {
     <div className="bg-slate-100" style={pageStyle}>
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#625DF5] to-transparent p-6">
         <header className="w-full max-w-4xl flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 bg-transparent px-6 py-3 shadow-sm mb-6 rounded-t-xl">
-          <Link to="/projects" className="flex items-center gap-3 text-white">
+          <Link to="/projects" className="flex items-center gap-3 text-white hover:text-white">
             <div className="inline-flex items-center justify-center bg-white rounded-full p-2">
               <img
                 src={logo}

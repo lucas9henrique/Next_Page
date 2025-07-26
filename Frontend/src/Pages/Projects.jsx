@@ -63,7 +63,7 @@ export default function Projects() {
       {/* HEADER FIXO */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-[#625DF5] to-transparent border-b border-slate-200">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-          <Link to="/projects" className="flex items-center gap-4 text-white">
+          <Link to="/projects" className="flex items-center gap-4 text-white hover:text-white">
             <img
               src={logo}
               alt="Logo"
