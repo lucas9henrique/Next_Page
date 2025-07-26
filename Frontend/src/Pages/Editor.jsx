@@ -1,7 +1,7 @@
-import { useState, useEffect, useContext, useCallback } from 'react'
+import { useState, useEffect, useContext, useCallback, useRef } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import TextAlign from '@tiptap/extension-text-align'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import StarterKit from '@tiptap/starter-kit'
 import Italic from '@tiptap/extension-italic'
 import Heading from '@tiptap/extension-heading'
@@ -52,8 +52,13 @@ const styleButtons = [
 
 function Editor({ editable = true }) {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [content, setContent] = useState('')
   const [saveStatus, setSaveStatus] = useState('idle')
+  const [shareCode, setShareCode] = useState('')
+  const [shareOpen, setShareOpen] = useState(false)
+  const shareRef = useRef(null)
+  const shareButtonRef = useRef(null)
   const { userId, token } = useContext(UserContext)
 
   /* extensões que o Tiptap deve carregar */
@@ -151,6 +156,22 @@ function Editor({ editable = true }) {
     return () => clearTimeout(handler)
   }, [content, saveContent])
 
+  useEffect(() => {
+    if (!shareOpen) return
+    function handleOutside(event) {
+      if (
+        shareRef.current &&
+        !shareRef.current.contains(event.target) &&
+        shareButtonRef.current &&
+        !shareButtonRef.current.contains(event.target)
+      ) {
+        setShareOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleOutside)
+    return () => document.removeEventListener('mousedown', handleOutside)
+  }, [shareOpen])
+
   const handleAction = (type) => {
     if (!editor) return
     const chain = editor.chain().focus()
@@ -189,8 +210,7 @@ function Editor({ editable = true }) {
         break
     }
   }
-  const handleJoin = async (e) => {
-      e.preventDefault();
+  const handleJoin = async () => {
       try {
         const response = await fetch(`http://localhost:8000/api/documents/${shareCode.trim()}/add_user`, {
           method: 'POST',
@@ -205,7 +225,8 @@ function Editor({ editable = true }) {
           throw new Error('Erro ao adicionar usuário');
         }
         else{
-        navigate(`/editor/${shareCode.trim()}`);
+          navigate(`/editor/${shareCode.trim()}`);
+          setShareOpen(false)
         }
       } catch (err) {
         console.error('Erro ao adicionar usuário:', err);
@@ -258,15 +279,35 @@ function Editor({ editable = true }) {
                   className="w-5 h-5"
                 />
               </button>
-              <button
-                onClick={handleJoin}
-                className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"           >
-                <img
-                  src={share}
-                  alt="share"
-                  className="w-5 h-5"
-                />
-              </button>
+              <div className="relative">
+                <button
+                  ref={shareButtonRef}
+                  onClick={() => setShareOpen(true)}
+                  className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"           >
+                  <img
+                    src={share}
+                    alt="share"
+                    className="w-5 h-5"
+                  />
+                </button>
+                {shareOpen && (
+                  <div
+                    ref={shareRef}
+                    className="absolute right-0 top-full mt-2 bg-white border rounded shadow p-2"
+                  >
+                    <input
+                      type="text"
+                      value={shareCode}
+                      onChange={(e) => setShareCode(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleJoin()
+                      }}
+                      placeholder="Código"
+                      className="border rounded px-2 py-1 text-sm text-slate-800"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Avatar */}
