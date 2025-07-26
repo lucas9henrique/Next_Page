@@ -212,20 +212,19 @@ function Editor({ editable = true }) {
   }
   const handleJoin = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/documents/${shareCode.trim()}/add_user`, {
+        const response = await fetch(`http://localhost:8000/api/documents/${id}/add_user`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ email: userId})
+          body: JSON.stringify({ email: shareCode.trim()})
         });
     
         if (!response.ok) {
           throw new Error('Erro ao adicionar usuário');
         }
         else{
-          navigate(`/editor/${shareCode.trim()}`);
           setShareOpen(false)
         }
       } catch (err) {
@@ -305,6 +304,12 @@ function Editor({ editable = true }) {
                       placeholder="Código"
                       className="border rounded px-2 py-1 text-sm text-slate-800"
                     />
+                    <button
+                      onClick={handleJoin}
+                      className="ml-2 rounded bg-blue-500 px-2 py-1 text-sm text-white hover:bg-blue-600"
+                    >
+                      Adicionar
+                    </button>
                   </div>
                 )}
               </div>
