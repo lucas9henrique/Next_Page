@@ -20,7 +20,8 @@ class Project(BaseModel):
     nomeProjeto: str
     codigo: str
     ultimaModificacao: datetime = Field(default_factory=datetime.utcnow)
-    donos: List[str]
+    dono: str
+    permissions: List[str] = Field(default_factory=list)
     Texto: str = ""
 
 class MongoDB:
@@ -53,14 +54,19 @@ class MongoDB:
             proj["_id"] = str(proj["_id"])
         return proj
 
-    def list_projects_for_owner(self, owner: str) -> List[dict]:
-        projs = list(self.projects.find({"donos": owner}))
+    def list_projects_for_user(self, user: str) -> List[dict]:
+        projs = list(self.projects.find({
+            "$or": [
+                {"dono": user},
+                {"permissions": user},
+            ]
+        }))
         for p in projs:
             p["_id"] = str(p["_id"])
         return projs
 
-    def add_owner(self, codigo: str, owner: str) -> None:
-        self.projects.update_one({"codigo": codigo}, {"$addToSet": {"donos": owner}})
+    def add_permission(self, codigo: str, user: str) -> None:
+        self.projects.update_one({"codigo": codigo}, {"$addToSet": {"permissions": user}})
 
     def update_project(self, codigo: str, data: dict) -> int:
         data["ultimaModificacao"] = datetime.utcnow()
