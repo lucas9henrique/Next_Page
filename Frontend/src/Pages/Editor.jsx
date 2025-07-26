@@ -13,22 +13,23 @@ import { UserContext } from './UserContext.jsx'
 import PaginationExtension, { PageNode, HeaderFooterNode, BodyNode } from "tiptap-extension-pagination";
 // Imagens
 // — Geral
-import logo          from '../assets/logo1.png';
-import loaderGif     from '../assets/loader.gif';
-import cloudIcon     from '../assets/cloud.png';
-import cloudOffIcon  from '../assets/cloud-off.png';
+import logo from '../assets/logo1.png';
+import loaderGif from '../assets/loader.gif';
+import cloudIcon from '../assets/cloud.png';
+import cloudOffIcon from '../assets/cloud-off.png';
 // — Ações de edição
-import redo          from '../assets/redo.png';
-import save          from '../assets/save.png';
-import undo          from '../assets/undo.png';
+import redo from '../assets/redo.png';
+import save from '../assets/save.png';
+import undo from '../assets/undo.png';
+import share from '../assets/compartilhar.png';
 // — Alinhamento de texto
-import center_align  from '../assets/center-align.png';
-import just_align    from '../assets/justification.png';
-import left_align    from '../assets/left-align.png';
-import right_align   from '../assets/right-align.png';
+import center_align from '../assets/center-align.png';
+import just_align from '../assets/justification.png';
+import left_align from '../assets/left-align.png';
+import right_align from '../assets/right-align.png';
 // — Estilo de fonte
-import bold_font     from '../assets/bold.png';
-import italic_font   from '../assets/italic.png';
+import bold_font from '../assets/bold.png';
+import italic_font from '../assets/italic.png';
 import underline_font from '../assets/underline.png';
 
 const pageStyle = { fontFamily: '"Roboto", "Noto Sans", sans-serif' };
@@ -105,10 +106,12 @@ function Editor({ editable = true }) {
 
   useEffect(() => {
     fetch(`http://localhost:8000/api/load/${id}`,
-      {headers:{
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-    }})
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        }
+      })
       .then((res) => res.ok ? res.json() : Promise.reject(res))
       .then((data) => {
         const html = data.content || ''
@@ -186,6 +189,29 @@ function Editor({ editable = true }) {
         break
     }
   }
+  const handleJoin = async (e) => {
+      e.preventDefault();
+      try {
+        const response = await fetch(`http://localhost:8000/api/documents/${shareCode.trim()}/add_user`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ email: userId})
+        });
+    
+        if (!response.ok) {
+          throw new Error('Erro ao adicionar usuário');
+        }
+        else{
+        navigate(`/editor/${shareCode.trim()}`);
+        }
+      } catch (err) {
+        console.error('Erro ao adicionar usuário:', err);
+        alert('Não foi possível adicionar o usuário.');
+      }
+    };
   return (
     <div className="bg-slate-100" style={pageStyle}>
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#625DF5] to-transparent p-6">
@@ -229,6 +255,15 @@ function Editor({ editable = true }) {
                 <img
                   src={save}
                   alt="save"
+                  className="w-5 h-5"
+                />
+              </button>
+              <button
+                onClick={handleJoin}
+                className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"           >
+                <img
+                  src={share}
+                  alt="share"
                   className="w-5 h-5"
                 />
               </button>

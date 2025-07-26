@@ -58,30 +58,6 @@ export default function Projects() {
       })
       .catch(() => setMenuOpen(false))
   }
-
-  const handleJoin = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(`http://localhost:8000/api/documents/${shareCode.trim()}/add_user`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ email: userId})
-      });
-  
-      if (!response.ok) {
-        throw new Error('Erro ao adicionar usuário');
-      }
-      else{
-      navigate(`/editor/${shareCode.trim()}`);
-      }
-    } catch (err) {
-      console.error('Erro ao adicionar usuário:', err);
-      alert('Não foi possível adicionar o usuário.');
-    }
-  };
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#625DF5] to-transparent">
       {/* HEADER FIXO */}
@@ -103,40 +79,11 @@ export default function Projects() {
             />
             <button
               ref={buttonRef}
-              onClick={() => setMenuOpen(prev => !prev)}
+              onClick={handleCreate}
               className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-600"
             >
               New Project
-            </button>
-            {menuOpen && (
-              <div
-                ref={menuRef}
-                className="absolute right-0 top-12 z-80 w-164 rounded-md bg-white p-4 shadow-lg space-y-3">
-                <button
-                  onClick={handleCreate}
-                  className="w-full rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-600"
-                >
-                  Create New Document
-                </button>
-
-                <form onSubmit={handleJoin} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={shareCode}
-                    onChange={e => setShareCode(e.target.value)}
-                    placeholder="Share code"
-                    className="flex-1 rounded-md border border-slate-300 px-2 py-1 text-black text-sm"
-                  />
-                  <button
-                    type="submit"
-                    className="rounded-md bg-blue-500 px-3 py-1 text-sm font-semibold text-white hover:bg-blue-600"
-                  >
-                    Enter
-                  </button>
-                </form>
-              </div>
-            )}
-            
+            </button>            
             <div
               className="w-10 h-10 rounded-full bg-cover bg-center border"
               style={{
