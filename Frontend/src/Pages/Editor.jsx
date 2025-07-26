@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, useCallback, useRef } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import TextAlign from '@tiptap/extension-text-align'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import StarterKit from '@tiptap/starter-kit'
 import Italic from '@tiptap/extension-italic'
 import Heading from '@tiptap/extension-heading'
@@ -236,18 +236,18 @@ function Editor({ editable = true }) {
     <div className="bg-slate-100" style={pageStyle}>
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#625DF5] to-transparent p-6">
         <header className="w-full max-w-4xl flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 bg-transparent px-6 py-3 shadow-sm mb-6 rounded-t-xl">
-          <div className="flex items-center gap-3 text-white">
+          <Link to="/projects" className="flex items-center gap-3 text-white">
             <div className="inline-flex items-center justify-center bg-white rounded-full p-2">
               <img
                 src={logo}
                 alt="Logo"
                 className="w-20 h-20"
-                style={{ fontFamily: 'Manrope, "Noto Sans", sans-serif' }}
+                style={{ fontFamily: 'Manrope, \"Noto Sans\", sans-serif' }}
               />
             </div>
 
             <h1 className="text-2xl font-bold tracking-tight">Next_Page</h1>
-          </div>
+          </Link>
           <div className="flex flex-1 items-center justify-end gap-6 relative">
             {/* Botões de ação */}
             <div className="flex items-center gap-2">
