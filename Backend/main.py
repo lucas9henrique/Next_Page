@@ -44,6 +44,10 @@ os.makedirs(REPOS_ROOT, exist_ok=True)
 SECRET_KEY = os.getenv("SECRET_KEY", "change_me")
 auth_scheme = HTTPBearer()
 
+def has_access(proj: dict, user: str) -> bool:
+    """Check if the given user can access/modify the project."""
+    return user == proj.get("dono") or user in proj.get("permissions", [])
+
 def init_db():
     conn = sqlite3.connect(USERS_DB)
     conn.execute(
@@ -147,7 +151,7 @@ def create_document(
                       committer=actor)
 
     # cria registro no Mongo
-    project = Project(nomeProjeto=doc.name, codigo=code, donos=[email])
+    project = Project(nomeProjeto=doc.name, codigo=code, dono=email)
     mongo.insert_project(project)
     return {"codigo": code}
 
@@ -156,7 +160,7 @@ def list_documents(
     mongo: MongoDB = Depends(get_mongo),
     email: str = Depends(verify_token),
 ):
-    projs = mongo.list_projects_for_owner(email)
+    projs = mongo.list_projects_for_user(email)
     result = []
     for p in projs:
         branches = []
@@ -180,9 +184,9 @@ def add_user_to_document(
     email: str = Depends(verify_token),
 ):
     proj = mongo.get_project(codigo)
-    if not proj or email not in proj["donos"]:
+    if not proj or not has_access(proj, email):
         raise HTTPException(404, "Document not found")
-    mongo.add_owner(codigo, new_user.email)
+    mongo.add_permission(codigo, new_user.email)
     return {"msg": "User added"}
 
 @app.post("/api/branches")
@@ -192,7 +196,7 @@ def create_branch(
     email: str = Depends(verify_token),
 ):
     proj = mongo.get_project(data.document)
-    if not proj or email not in proj["donos"]:
+    if not proj or not has_access(proj, email):
         raise HTTPException(404, "Document not found")
     path = os.path.join(REPOS_ROOT, data.document)
     repo = Repo(path)
@@ -208,7 +212,7 @@ def list_branches(
     email: str = Depends(verify_token),
 ):
     proj = mongo.get_project(document)
-    if not proj or email not in proj["donos"]:
+    if not proj or not has_access(proj, email):
         raise HTTPException(404, "Document not found")
     path = os.path.join(REPOS_ROOT, document)
     return [h.name for h in Repo(path).heads]
@@ -220,7 +224,7 @@ def merge_branches(
     email: str = Depends(verify_token),
 ):
     proj = mongo.get_project(data.document)
-    if not proj or email not in proj["donos"]:
+    if not proj or not has_access(proj, email):
         raise HTTPException(404, "Document not found")
     path = os.path.join(REPOS_ROOT, data.document)
     repo = Repo(path)
@@ -239,7 +243,7 @@ async def save_document(
     email: str = Depends(verify_token),
 ):
     proj = mongo.get_project(document)
-    if not proj or email not in proj["donos"]:
+    if not proj or not has_access(proj, email):
         raise HTTPException(404, "Document not found")
     
     path = os.path.join(REPOS_ROOT, document)
@@ -281,7 +285,7 @@ def load_document(
     email: str = Depends(verify_token),
 ):
     proj = mongo.get_project(document)
-    if not proj or email not in proj["donos"]:
+    if not proj or not has_access(proj, email):
         raise HTTPException(404, "Document not found")
     path = os.path.join(REPOS_ROOT, document)
     remove_git_lock(path)
@@ -301,7 +305,7 @@ def commit_history(
     email: str = Depends(verify_token),
 ):
     proj = mongo.get_project(document)
-    if not proj or email not in proj["donos"]:
+    if not proj or not has_access(proj, email):
         raise HTTPException(404, "Document not found")
     path = os.path.join(REPOS_ROOT, document)
     ref = branch or "HEAD"
