@@ -42,10 +42,10 @@ function Register() {
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#625DF5] to-transparent p-6">
         <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-2xl">
           <div className="mb-8 flex flex-col items-center">
-            <div className="mb-4 flex items-center gap-3 text-slate-800">
+          <Link to="/projects" className="mb-4 flex items-center gap-3 text-slate-800">
               <img src={logo} alt="Logo" className="w-20 h-20" />
               <h1 className="text-3xl font-bold tracking-tight">Next_Page</h1>
-            </div>
+            </Link>
             <p className="text-slate-600">Create your account.</p>
           </div>
           <form className="space-y-6" onSubmit={handleSubmit}>

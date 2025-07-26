@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react'
 import { UserContext } from './UserContext.jsx'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import logo from '../assets/logo1.png'
 
 export default function Projects() {
@@ -63,14 +63,14 @@ export default function Projects() {
       {/* HEADER FIXO */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-[#625DF5] to-transparent border-b border-slate-200">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-4 text-white">
+          <Link to="/projects" className="flex items-center gap-4 text-white">
             <img
               src={logo}
               alt="Logo"
               className="w-12 h-12 rounded-full bg-white p-1"
             />
             <span className="text-2xl font-bold">Next_Page</span>
-          </div>
+          </Link>
           <div className="flex items-center gap-4 relative">
             <input
               type="text"
