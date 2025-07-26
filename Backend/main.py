@@ -2,12 +2,15 @@ import os
 import uuid
 import sqlite3
 import hashlib
+import shutil
 from datetime import datetime, timedelta
 from pathlib import Path   
 from git import Repo, Actor
 from git.exc import GitCommandError
 from pathlib import Path
 from collections import defaultdict
+from typing import List
+from fastapi import WebSocket, WebSocketDisconnect
 import asyncio
 
 from fastapi import FastAPI, HTTPException, Depends
@@ -20,6 +23,12 @@ from git import Repo, Actor
 from db import get_mongo, MongoDB, Project
 
 repo_locks: dict[str, asyncio.Lock] = defaultdict(asyncio.Lock)
+
+active_connections: dict[str, list[WebSocket]] = defaultdict(list)
+
+class UserPermissionInfo(BaseModel):
+    email: str
+    role: str # 'owner' ou 'collaborator'
 
 def remove_git_lock(path: str):
     lock_path = os.path.join(path, ".git", "index.lock")
@@ -253,17 +262,14 @@ async def save_document(
     repo = Repo(path)
 
     async with repo_locks[document]:           
-        # Troca de branch só se necessário
         if repo.head.is_valid() and repo.active_branch.name != branch:
             try:
                 repo.git.checkout(branch)
             except GitCommandError:
-                # Geralmente apenas “document.txt” não rastreado – força a troca
                 repo.git.checkout(branch, force=True)
         elif branch not in repo.heads:
-            repo.git.checkout("-b", branch)     # cria a nova branch
+            repo.git.checkout("-b", branch)     
 
-        # Escreve e commita se houver mudanças
         file_path = Path(path) / "document.txt"
         file_path.write_text(data.content, encoding="utf-8")
 
@@ -273,7 +279,6 @@ async def save_document(
             repo.index.commit(data.message or "Update",
                               author=actor, committer=actor)
 
-    # atualiza Mongo
     mongo.update_project(document, {"Texto": data.content})
     return {"msg": "Document saved"}
 
@@ -296,6 +301,79 @@ def load_document(
     file_path = os.path.join(path, "document.txt")
     content = open(file_path, "r", encoding="utf-8").read() if os.path.exists(file_path) else ""
     return {"content": content}
+
+@app.post("/api/documents/{codigo}/remove_user")
+def remove_user_from_document(
+    codigo: str,
+    user_to_remove: UserEmail,
+    mongo: MongoDB = Depends(get_mongo),
+    email: str = Depends(verify_token),  
+):
+
+    proj = mongo.get_project(codigo)
+
+    if not proj:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    if proj.get("dono") != email:
+        raise HTTPException(status_code=403, detail="Forbidden: Only the document owner can remove users.")
+
+    if user_to_remove.email not in proj.get("permissions", []):
+        raise HTTPException(status_code=404, detail="User to be removed not found in this document's permissions.")
+
+    mongo.remove_permission(codigo, user_to_remove.email)
+
+    return {"msg": f"User {user_to_remove.email} removed successfully from document {codigo}."}
+
+
+@app.delete("/api/documents/{codigo}")
+def delete_document(
+    codigo: str,
+    mongo: MongoDB = Depends(get_mongo),
+    email: str = Depends(verify_token),
+):
+
+    proj = mongo.get_project(codigo)
+
+    if not proj:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    if proj.get("dono") != email:
+        raise HTTPException(status_code=403, detail="Forbidden: Only the document owner can delete the document.")
+
+    mongo.db.projects.delete_one({"codigo": codigo})
+
+    repo_path = os.path.join(REPOS_ROOT, codigo)
+    if os.path.exists(repo_path):
+        try:
+            shutil.rmtree(repo_path)
+        except Exception as e:
+            print(f"CRITICAL: Failed to delete repository folder {repo_path}. Please remove manually. Error: {e}")
+            return {"msg": "Document deleted from database, but failed to delete repository files."}
+
+    return {"msg": f"Document {codigo} has been permanently deleted."}
+
+@app.get("/api/documents/{codigo}/users", response_model=List[UserPermissionInfo])
+def list_document_users(
+    codigo: str,
+    mongo: MongoDB = Depends(get_mongo),
+    email: str = Depends(verify_token),
+):
+   
+    proj = mongo.get_project(codigo)
+
+    if not proj or not has_access(proj, email):
+        raise HTTPException(status_code=404, detail="Document not found or access denied")
+
+    users_list = []
+
+    if proj.get("dono"):
+        users_list.append({"email": proj["dono"], "role": "owner"})
+
+    for collaborator_email in proj.get("permissions", []):
+        users_list.append({"email": collaborator_email, "role": "collaborator"})
+
+    return users_list
 
 @app.get("/api/history/{document}")
 def commit_history(

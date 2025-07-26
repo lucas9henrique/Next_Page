@@ -68,6 +68,10 @@ class MongoDB:
     def add_permission(self, codigo: str, user: str) -> None:
         self.projects.update_one({"codigo": codigo}, {"$addToSet": {"permissions": user}})
 
+
+    def remove_permission(self, codigo: str, user: str) -> None:
+        self.projects.update_one({"codigo": codigo}, {"$pull": {"permissions": user}})
+
     def update_project(self, codigo: str, data: dict) -> int:
         data["ultimaModificacao"] = datetime.utcnow()
         res: UpdateResult = self.projects.update_one(
