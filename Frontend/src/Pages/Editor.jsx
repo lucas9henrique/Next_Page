@@ -129,7 +129,7 @@ function Editor({ editable = true }) {
         setTitle(loadedTitle)
         if (editor) editor.commands.setContent(html)
       })
-      .catch(() => {})
+      .catch(() => { })
   }, [id, editor])
 
   const saveContent = useCallback(() => {
@@ -215,27 +215,27 @@ function Editor({ editable = true }) {
     }
   }
   const handleJoin = async () => {
-      try {
-        const response = await fetch(`http://localhost:8000/api/documents/${id}/add_user`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ email: shareCode.trim()})
-        });
-    
-        if (!response.ok) {
-          throw new Error('Erro ao adicionar usuário');
-        }
-        else{
-          setShareOpen(false)
-        }
-      } catch (err) {
-        console.error('Erro ao adicionar usuário:', err);
-        alert('Não foi possível adicionar o usuário.');
+    try {
+      const response = await fetch(`http://localhost:8000/api/documents/${id}/add_user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ email: shareCode.trim() })
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao adicionar usuário');
       }
-    };
+      else {
+        setShareOpen(false)
+      }
+    } catch (err) {
+      console.error('Erro ao adicionar usuário:', err);
+      alert('Não foi possível adicionar o usuário.');
+    }
+  };
   return (
     <div className="bg-slate-100" style={pageStyle}>
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#625DF5] to-transparent p-6">
@@ -333,55 +333,116 @@ function Editor({ editable = true }) {
               {/* Botões de fonte */}
               {styleButtons.map(({ img, alt, action }) => (
                 <button
-                  key={alt}
-                  type="button"
+                  key={action}
                   onClick={() => handleAction(action)}
-                  className="rounded-md p-2 hover:bg-slate-200"
-                  aria-label={alt}
-                  title={alt}
-                >
-                  <img src={img} alt={alt} className="w-5 h-5" />
+                  className={`
+        p-2 rounded-md transition-colors
+        ${editor?.isActive(action)
+                      ? 'bg-slate-200'
+                      : 'hover:bg-slate-200'}`}>
+                  <img src={img} alt={alt} className="w-4 h-4" />
                 </button>
               ))}
+              {/* Botões de texto */}
+              <div className="h-5 w-px bg-slate-300 mx-1"></div>
+              <button
+                onClick={() => handleAction('heading2')}
+                className={`p-2 rounded-md ${editor?.isActive('heading', { level: 2 }) ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
+                  } transition-colors`}
+              >
+                <span className="font-bold">H2</span>
+              </button>
+              <button
+                onClick={() => handleAction('bulletList')}
+                className={`p-2 rounded-md ${editor?.isActive('bulletList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
+                  } transition-colors`}
+              >
+                <span>&bull;</span>
+              </button>
+              <button
+                onClick={() => handleAction('orderedList')}
+                className={`p-2 rounded-md ${editor?.isActive('orderedList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
+                  } transition-colors`}
+              >
+                <span>1.</span>
+              </button>
+              <div className="h-5 w-px bg-slate-300 mx-1"></div>
+              <div className="flex items-center gap-2">
+                {alignButtons.map(({ img, alt, action }) => (
+                  <button
+                    key={action}
+                    onClick={() => handleAction(action)}
+                    className={`
+          p-2 rounded-md transition-colors
+          ${editor?.isActive({ textAlign: action.replace('align', '').toLowerCase() })
+                        ? 'bg-slate-200'
+                        : 'hover:bg-slate-200'
+                      } `}
+                  >
+                    <img src={img} alt={alt} className="w-5 h-5" />
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex gap-2">
-              {alignButtons.map(({ img, alt, action }) => (
-                <button
-                  key={alt}
-                  type="button"
-                  onClick={() => handleAction(action)}
-                  className="rounded-md p-2 hover:bg-slate-200"
-                  aria-label={alt}
-                  title={alt}
-                >
-                  <img src={img} alt={alt} className="w-5 h-5" />
-                </button>
-              ))}
+
+            {/* Título do documento */}
+            <label htmlFor="doc-title" className="mb-1 text-lg font-semibold text-gray-700 select-none">
+            </label>
+            <input
+              id="doc-title"
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Digite o título do documento"
+              className="mb-6 text-3xl font-bold outline-none border-none w-full px-2 py-1 text-gray-800 placeholder-gray-400 bg-transparent"
+            />
+
+            {/* salvamento */}
+            <div className="flex items-center gap-2 text-sm">
+              {saveStatus === 'saving' && (
+                <img src={loaderGif} alt="Salvando..." className="w-5 h-5 animate-spin" />
+              )}
+              {saveStatus === 'saved' && (
+                <>
+                  <img
+                    src={cloudIcon}
+                    alt="Salvo"
+                    className="w-5 h-5"
+                  />
+                  <span className="text-green-400">Salvo</span>
+                </>
+              )}
+              {saveStatus === 'error' && (
+                <>
+                  <img
+                    src={cloudOffIcon}
+                    alt="Erro ao salvar"
+                    className="w-5 h-5"
+                  />
+                  <span className="text-red-400">Erro ao salvar</span>
+                </>
+              )}
+              {saveStatus === 'idle' && (
+                <img
+                  src={cloudIcon}
+                  alt="Pronto"
+                  className="w-5 h-5 text-gray-400"
+                />
+              )}
             </div>
+            {/* EditorContent */}
+            <EditorContent
+              editor={editor}
+              className="w-full h-full outline-none text-black flex-grow p-10"
+            />
           </div>
-
-          {/* Título do documento */}
-          <label htmlFor="doc-title" className="mb-1 text-lg font-semibold text-gray-700 select-none">
-            Título do Documento
-          </label>
-          <input
-            id="doc-title"
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Digite o título do documento"
-            className="mb-6 text-3xl font-bold outline-none border-none w-full px-2 py-1 text-gray-800 placeholder-gray-400 bg-transparent"
-          />
-
-          {/* EditorContent */}
-          <EditorContent
-            editor={editor}
-            className="w-full h-full outline-none text-black flex-grow p-10"
-          />
+          {/* Rodapé */}
+          <footer className="mt-10 text-center text-sm text-slate-400">
+            <p>© 2025 CodeCollab. All rights reserved.</p>
+          </footer>
         </div>
-      </main>
-    </div>
-  )
+      </div>
+      )
 }
 
-export default Editor
+      export default Editor
