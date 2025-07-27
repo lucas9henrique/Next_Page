@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react'
 import { UserContext } from './UserContext.jsx'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import logo from '../assets/logo1.png'
 
 export default function Projects() {
@@ -17,8 +17,7 @@ export default function Projects() {
   useEffect(() => {
     if (!userId) return
     setIsLoading(true)
-
-    fetch(`http://localhost:8000/api/projects?user_id=${userId}`, {
+    fetch(`http://localhost:8000/api/documents`, {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
@@ -49,15 +48,16 @@ export default function Projects() {
   }, [menuOpen])
 
   const handleCreate = () => {
-    fetch('http://localhost:8000/documents', {
+    fetch('http://localhost:8000/api/documents', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: 'Untitled' }),
+      headers: { 'Content-Type': 'application/json',
+                 'Authorization': `Bearer ${token}`},
+      body: JSON.stringify({ name: 'Untitled' }),
     })
       .then(res => (res.ok ? res.json() : Promise.reject(res)))
       .then(data => {
         setMenuOpen(false)
-        navigate(`/editor/${data.id}`)
+        navigate(`/editor/${data.codigo}`)
       })
       .catch(() => {
         setMenuOpen(false)
@@ -103,14 +103,14 @@ export default function Projects() {
     <div className="min-h-screen bg-gradient-to-b from-[#625DF5] to-transparent">
       <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-[#625DF5] to-transparent border-b border-slate-200">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-4 text-white">
+          <Link to="/projects" className="flex items-center gap-4 text-white hover:text-white">
             <img
               src={logo}
               alt="Logo"
               className="w-12 h-12 rounded-full bg-white p-1"
             />
             <span className="text-2xl font-bold">Next_Page</span>
-          </div>
+          </Link>
           <div className="flex items-center gap-4 relative">
             <input
               type="text"
@@ -121,38 +121,11 @@ export default function Projects() {
             />
             <button
               ref={buttonRef}
-              onClick={() => setMenuOpen(prev => !prev)}
+              onClick={handleCreate}
               className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-600"
             >
               New Project
-            </button>
-            {menuOpen && (
-              <div
-                ref={menuRef}
-                className="absolute right-0 top-12 z-80 w-64 rounded-md bg-white p-4 shadow-lg space-y-3">
-                <button
-                  onClick={handleCreate}
-                  className="w-full rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-600"
-                >
-                  Create New Document
-                </button>
-                <form onSubmit={handleJoin} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={shareCode}
-                    onChange={e => setShareCode(e.target.value)}
-                    placeholder="Share code"
-                    className="flex-1 rounded-md border border-slate-300 px-2 py-1 text-black text-sm"
-                  />
-                  <button
-                    type="submit"
-                    className="rounded-md bg-blue-500 px-3 py-1 text-sm font-semibold text-white hover:bg-blue-600"
-                  >
-                    Enter
-                  </button>
-                </form>
-              </div>
-            )}
+            </button>            
             <div
               className="w-10 h-10 rounded-full bg-cover bg-center border"
               style={{
@@ -195,29 +168,28 @@ export default function Projects() {
                   </tr>
                 ) : filteredProjects.length > 0 ? (
                   filteredProjects.map(proj => (
-                    <tr key={proj.id}>
+                    <tr key={proj.codigo}>
                       <td className="px-6 py-4 text-sm font-medium text-slate-900">
-                        {proj.name}
+                        {proj.nomeProjeto}
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-600">
-                        {new Date(proj.last_modified).toLocaleDateString()}
+                      {new Date(proj.ultimaModificacao + 'Z').toLocaleString('pt-BR', {
+                          timeZone: 'America/Sao_Paulo',
+                        })}
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${proj.main_branch === 'main'
+                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${(proj.branches?.[0] || '') === 'main'
                               ? 'bg-green-100 text-green-800'
                               : 'bg-blue-100 text-blue-800'
                             }`}
                         >
-                          {proj.main_branch}
+                          {proj.branches?.[0] || ''}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm font-medium">
                         <div className="flex gap-2">
-                          <button
-                            onClick={() => navigate(`/editor/${proj.id}`)}
-                            className="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200"
-                          >
+                          <button className="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200" onClick={() => navigate(`/editor/${proj.codigo}`)}>                        
                             Edit
                           </button>
                           <button
