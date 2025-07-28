@@ -23,6 +23,7 @@ class Project(BaseModel):
     dono: str
     permissions: List[str] = Field(default_factory=list)
     Texto: str = ""
+    branch: str = "main"
 
 class MongoDB:
     def __init__(self):

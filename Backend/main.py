@@ -166,7 +166,7 @@ def create_document(
                       committer=actor)
 
     # cria registro no Mongo
-    project = Project(nomeProjeto=doc.name, codigo=code, dono=email)
+    project = Project(nomeProjeto=doc.name, codigo=code, dono=email, branch="main")
     mongo.insert_project(project)
     return {"codigo": code}
 
@@ -194,6 +194,7 @@ def list_documents(
             "nomeProjeto": p["nomeProjeto"],
             "ultimaModificacao": p["ultimaModificacao"].isoformat(),
             "branches": branches,
+            "branch": p.get("branch", "main"),
         })
     return result
 
@@ -294,6 +295,8 @@ async def save_document(
     update_fields: dict[str, str] = {"Texto": data.content}
     if data.title is not None:
         update_fields["nomeProjeto"] = data.title
+    if data.branch is not None:
+        update_fields["branch"] = data.branch
 
     # Persist updated text and optional title in MongoDB
     if update_fields:
@@ -319,7 +322,7 @@ def load_document(
     path = os.path.join(REPOS_ROOT, document)
     remove_git_lock(path)
     repo = Repo(path)
-    ref = branch or "main"
+    ref = branch or proj.get("branch", "main")
     if ref in repo.heads:
         repo.git.checkout(ref)
 
@@ -337,6 +340,7 @@ def load_document(
     return {
         "content": content,
         "title": title,
+        "branch": ref,
     }
 
 @app.post("/api/documents/{codigo}/remove_user")
