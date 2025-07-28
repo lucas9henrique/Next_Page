@@ -224,7 +224,20 @@ def create_branch(
     repo = Repo(path)
     if data.branch in repo.heads:
         raise HTTPException(400, "Branch already exists")
+
     repo.git.branch(data.branch)
+
+    new_branch = {
+        "nome": data.branch,
+        "conteudo": proj.get("Texto", ""),
+        "nomeProjeto": proj.get("nomeProjeto"),
+        "ultimaModificacao": datetime.utcnow(),
+    }
+    mongo.projects.update_one(
+        {"codigo": data.document},
+        {"$push": {"branches": new_branch}}
+    )
+
     return {"msg": "Branch created"}
 
 @app.get("/api/branches/{document}")
@@ -297,6 +310,16 @@ async def save_document(
         update_fields["nomeProjeto"] = data.title
     if data.branch is not None:
         update_fields["branch"] = data.branch
+
+    mongo.projects.update_one(
+        {"codigo": document, "branches.nome": branch},
+        {
+            "$set": {
+                "branches.$.conteudo": data.content,
+                "branches.$.ultimaModificacao": datetime.utcnow(),
+            }
+        },
+    )
 
     # Persist updated text and optional title in MongoDB
     if update_fields:
