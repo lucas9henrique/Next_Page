@@ -374,7 +374,7 @@ def delete_document(
     if proj.get("dono") != email:
         raise HTTPException(status_code=403, detail="Forbidden: Only the document owner can delete the document.")
 
-    mongo.db.projects.delete_one({"codigo": codigo})
+    mongo.delete(codigo)
 
     repo_path = os.path.join(REPOS_ROOT, codigo)
     if os.path.exists(repo_path):

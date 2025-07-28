@@ -79,6 +79,13 @@ class MongoDB:
             {"$set": data}
         )
         return res.modified_count
+    
+    def delete_project(self, codigo: str) -> int:
+        """Remove um projeto e retorna o número de documentos excluídos."""
+        res = self.projects.delete_one({"codigo": codigo})
+        return res.deleted_count
+    def delete(self, codigo: str) -> int:
+        return self.delete_project(codigo)
 
 # dependency para FastAPI
 def get_mongo() -> MongoDB:

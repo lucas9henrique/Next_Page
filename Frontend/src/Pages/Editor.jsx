@@ -649,7 +649,7 @@ function Editor({ editable = true }) {
 
         {/* Rodapé */}
         <footer className="mt-10 text-center text-sm text-slate-400">
-          <p>© 2025 CodeCollab. All rights reserved.</p>
+          <p>© 2025 NextPage. All rights reserved.</p>
         </footer>
       </div>
     </div>

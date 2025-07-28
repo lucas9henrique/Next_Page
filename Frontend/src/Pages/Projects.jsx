@@ -201,8 +201,12 @@ export default function Projects() {
               </tbody>
             </table>
           </div>
-        </div>
+        </div>      
       </main>
+       {/* Rodapé */}
+       <footer className="mt-10 text-center text-sm text-slate-400">
+          <p>© 2025 NextPage. All rights reserved.</p>
+        </footer>
     </div>
   )
 }
