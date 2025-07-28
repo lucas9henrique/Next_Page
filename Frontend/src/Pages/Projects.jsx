@@ -78,7 +78,7 @@ export default function Projects() {
   const filteredProjects = useMemo(
     () =>
       projects.filter(proj =>
-        proj.nomeProjeto?.toLowerCase().includes(searchTerm.toLowerCase())
+        (proj.nomeProjeto || '').toLowerCase().includes(searchTerm.toLowerCase())
       ),
     [projects, searchTerm]
   )

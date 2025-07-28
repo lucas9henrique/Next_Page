@@ -175,9 +175,15 @@ def list_documents(
     for p in projs:
         branches = []
         repo_path = os.path.join(REPOS_ROOT, p["codigo"])
-        if os.path.isdir(repo_path):
-            for h in Repo(repo_path).heads:
-                branches.append(h.name)
+        git_dir = os.path.join(repo_path, ".git")
+        if os.path.isdir(git_dir):
+            try:
+                for h in Repo(repo_path).heads:
+                    branches.append(h.name)
+            except Exception:
+                # In case the repository is corrupted or otherwise invalid,
+                # we simply skip branch enumeration.
+                pass
         result.append({
             "codigo": p["codigo"],
             "nomeProjeto": p["nomeProjeto"],
