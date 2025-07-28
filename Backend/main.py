@@ -218,13 +218,45 @@ def create_branch(
 ):
     proj = mongo.get_project(data.document)
     if not proj or not has_access(proj, email):
-        raise HTTPException(404, "Document not found")
+        raise HTTPException(status_code=404, detail="Document not found")
+    
     path = os.path.join(REPOS_ROOT, data.document)
     repo = Repo(path)
     if data.branch in repo.heads:
-        raise HTTPException(400, "Branch already exists")
+        raise HTTPException(status_code=400, detail="Branch already exists")
+    
+    # Passo 1: Cria a branch no repositório Git (como antes)
     repo.git.branch(data.branch)
+    
+    # Passo 2 (NOVO): Adiciona o nome da branch ao registro no MongoDB
+    mongo.add_branch(data.document, data.branch)
+    
     return {"msg": "Branch created"}
+
+@app.delete("/api/branches")
+def delete_branch(
+    data: BranchData,
+    mongo: MongoDB = Depends(get_mongo),
+    email: str = Depends(verify_token),
+):
+    if data.branch == "main":
+        raise HTTPException(status_code=400, detail="Cannot delete the main branch.")
+
+    proj = mongo.get_project(data.document)
+    if not proj or not has_access(proj, email):
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    # Deleta do Git
+    path = os.path.join(REPOS_ROOT, data.document)
+    repo = Repo(path)
+    if data.branch not in repo.heads:
+        raise HTTPException(status_code=404, detail="Branch not found in repository.")
+    repo.git.branch('-D', data.branch)
+
+    # Deleta do MongoDB
+    mongo.remove_branch(data.document, data.branch)
+
+    return {"msg": f"Branch '{data.branch}' deleted successfully."}
 
 @app.get("/api/branches/{document}")
 def list_branches(
@@ -234,9 +266,9 @@ def list_branches(
 ):
     proj = mongo.get_project(document)
     if not proj or not has_access(proj, email):
-        raise HTTPException(404, "Document not found")
-    path = os.path.join(REPOS_ROOT, document)
-    return [h.name for h in Repo(path).heads]
+        raise HTTPException(status_code=404, detail="Document not found")
+    
+    return proj.get("branches", [])
 
 @app.post("/api/merge")
 def merge_branches(
