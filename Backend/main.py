@@ -26,6 +26,11 @@ repo_locks: dict[str, asyncio.Lock] = defaultdict(asyncio.Lock)
 
 active_connections: dict[str, list[WebSocket]] = defaultdict(list)
 
+# Dicionários para estado em memória
+active_connections: dict[str, list[WebSocket]] = defaultdict(list)
+# NOVO: Dicionário para guardar o estado "ao vivo" de cada documento ativo
+document_buffers: dict[str, str] = {}
+
 class UserPermissionInfo(BaseModel):
     email: str
     role: str # 'owner' ou 'collaborator'
@@ -442,50 +447,65 @@ async def websocket_endpoint(
     token: str,
     mongo: MongoDB = Depends(get_mongo),
 ):
-    # 1. Authentication and Authorization (your code is already correct)
+    # 1. Autenticação e Autorização (continua igual)
     try:
         email = verify_token(HTTPAuthorizationCredentials(scheme="Bearer", credentials=token))
         proj = mongo.get_project(codigo_documento)
         if not proj or not has_access(proj, email):
-            await websocket.close(code=1008) # Policy Violation
+            await websocket.close(code=1008)
             return
     except Exception:
         await websocket.close(code=1008)
         return
 
-    # 2. Accept connection and send initial state (your code is already correct)
+    # 2. Conexão e Gerenciamento de Buffer
     await websocket.accept()
     active_connections[codigo_documento].append(websocket)
-    try:
-        repo_path = os.path.join(REPOS_ROOT, codigo_documento)
-        file_path = os.path.join(repo_path, "document.txt")
-        content = open(file_path, "r", encoding="utf-8").read() if os.path.exists(file_path) else ""
-        await websocket.send_text(content)
-    except Exception as e:
-        print(f"Error loading initial content: {e}")
-        await websocket.send_text("") 
 
-    # 3. Communication loop with persistence
+    # Se este é o primeiro usuário a se conectar, carregue o documento para o buffer
+    if codigo_documento not in document_buffers:
+        try:
+            repo_path = os.path.join(REPOS_ROOT, codigo_documento)
+            file_path = os.path.join(repo_path, "document.txt")
+            content = open(file_path, "r", encoding="utf-8").read() if os.path.exists(file_path) else ""
+            document_buffers[codigo_documento] = content
+        except Exception as e:
+            print(f"Error loading initial content into buffer: {e}")
+            document_buffers[codigo_documento] = ""
+    
+    # Envia o conteúdo atual do buffer para o novo usuário
+    await websocket.send_text(document_buffers[codigo_documento])
+
+    # 3. Loop de Comunicação
     try:
         while True:
             new_text = await websocket.receive_text()
+            
+            # ATUALIZA O BUFFER CENTRAL
+            document_buffers[codigo_documento] = new_text
 
-            # Broadcast to other clients
+            # Retransmite o novo estado do buffer para todos os outros
             for connection in active_connections[codigo_documento]:
                 if connection is not websocket: 
                     await connection.send_text(new_text)
-            
-            # CHANGE 1: Persist the change to the file
-            try:
-                file_path = os.path.join(REPOS_ROOT, codigo_documento, "document.txt")
-                with open(file_path, "w", encoding="utf-8") as f:
-                    f.write(new_text)
-            except Exception as e:
-                print(f"CRITICAL ERROR: Failed to save file via WebSocket. Error: {e}")
 
     except WebSocketDisconnect:
-        # CHANGE 2: Enhanced cleanup
+        # Limpeza aprimorada
         active_connections[codigo_documento].remove(websocket)
+        
+        # Se este era o ÚLTIMO usuário, salve o buffer no arquivo e limpe a memória
         if not active_connections[codigo_documento]:
-            del active_connections[codigo_documento]
-            print(f"All connections for document {codigo_documento} have been closed.")
+            try:
+                final_text = document_buffers[codigo_documento]
+                file_path = os.path.join(REPOS_ROOT, codigo_documento, "document.txt")
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(final_text)
+                
+                print(f"Document {codigo_documento} saved to file after last user disconnected.")
+                
+                # Limpa os dicionários para economizar memória
+                del active_connections[codigo_documento]
+                del document_buffers[codigo_documento]
+
+            except Exception as e:
+                print(f"CRITICAL ERROR: Failed to save buffer to file for doc {codigo_documento}. Error: {e}")
