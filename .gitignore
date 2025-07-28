@@ -23,5 +23,12 @@ dist-ssr
 *.sln
 *.sw?
 *.pyc
+*.txt
+*.pyc
 *.db
 /Backend/__pycache__
+<<<<<<< Updated upstream
+Backend/.env
+/Backend/__pycache__
+/Backend/repos
+/Backend/venv

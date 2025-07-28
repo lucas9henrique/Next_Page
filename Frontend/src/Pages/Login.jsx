@@ -1,38 +1,31 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useContext  } from 'react'
 import './Login.css'
 import logo from '../assets/logo1.png'
 import { Link, useNavigate } from 'react-router-dom'
+import { UserContext } from './UserContext.jsx'
 
 function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const { login } = useContext(UserContext)
   const errorRef = useRef(null)
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const resp = await fetch('http://localhost:8000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
-      if (!resp.ok) {
-        const data = await resp.json()
-        setError(data.detail || 'Login failed')
-        const node = errorRef.current
-        if (node) {
-          node.style.animation = 'none'
-          node.offsetHeight
-          node.style.animation = ''
-        }
-      } else {
-        setError('')
-        navigate('/projects')
-      }
+      await login(email, password)
+      setError('')
+      navigate('/projects')
     } catch (err) {
-      setError('Network error')
+      setError(err.message || 'Login failed')
+      const node = errorRef.current
+      if (node) {
+        node.style.animation = 'none'
+        node.offsetHeight
+        node.style.animation = ''
+      }
     }
   }
 
@@ -41,7 +34,10 @@ function Login() {
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#625DF5] to-transparent p-6">
         <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-2xl">
           <div className="mb-8 flex flex-col items-center">
-            <div className="mb-4 flex items-center gap-3 text-slate-800">
+            <div
+              className="mb-4 flex items-center gap-3 text-slate-800 cursor-pointer"
+              onClick={() => navigate('/projects')}
+            >
               <img src={logo} alt="Logo" className="w-20 h-20" />
               <h1 className="text-3xl font-bold tracking-tight">Next_Page</h1>
             </div>
