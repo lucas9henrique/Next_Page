@@ -171,6 +171,22 @@ function Editor({ editable = true }) {
     fetchHistory();
   }, [fetchHistory]);
 
+  // Load initial document content and title
+  useEffect(() => {
+    if (!id || !token || !editor) return;
+    fetch(`http://localhost:8000/api/load/${id}?branch=${currentBranch}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data) {
+          editor.commands.setContent(data.content || "");
+          setTitle(data.title || "Título do Documento");
+        }
+      })
+      .catch(() => {});
+  }, [id, token, editor, currentBranch]);
+
   // MUDANÇA: A função agora pega o conteúdo direto do editor.
   const saveContent = useCallback(
     (message) => {
