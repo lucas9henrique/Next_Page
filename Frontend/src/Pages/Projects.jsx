@@ -58,6 +58,20 @@ export default function Projects() {
       })
       .catch(() => setMenuOpen(false))
   }
+
+  const handleDelete = codigo => {
+    if (!window.confirm('Are you sure you want to delete this project?')) return
+    fetch(`http://localhost:8000/api/documents/${codigo}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    }).then(res => {
+      if (res.ok) {
+        setProjects(prev => prev.filter(p => p.codigo !== codigo))
+      }
+    })
+  }
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#625DF5] to-transparent">
       {/* HEADER FIXO */}
@@ -147,7 +161,10 @@ export default function Projects() {
                           <button className="rounded-md bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-200" onClick={() => navigate(`/editor/${proj.codigo}`)}>                        
                             Edit
                           </button>
-                          <button className="rounded-md bg-red-100 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-200">
+                          <button
+                            className="rounded-md bg-red-100 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-200"
+                            onClick={() => handleDelete(proj.codigo)}
+                          >
                             Delete
                           </button>
                         </div>
