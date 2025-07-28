@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react'
+import React, { useState, useEffect, useContext, useRef, useMemo } from 'react'
 import { UserContext } from './UserContext.jsx'
 import { useNavigate} from 'react-router-dom'
 import logo from '../assets/logo1.png'
@@ -42,7 +42,6 @@ export default function Projects() {
         setMenuOpen(false)
       }
     }
-
     document.addEventListener('mousedown', handleOutside)
     return () => document.removeEventListener('mousedown', handleOutside)
   }, [menuOpen])
@@ -75,6 +74,14 @@ export default function Projects() {
       }
     })
   }
+
+  const filteredProjects = useMemo(
+    () =>
+      projects.filter(proj =>
+        proj.nomeProjeto?.toLowerCase().includes(searchTerm.toLowerCase())
+      ),
+    [projects, searchTerm]
+  )
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#625DF5] to-transparent">
       <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-[#625DF5] to-transparent border-b border-slate-200">
@@ -96,7 +103,7 @@ export default function Projects() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search in projects"
-              className="w-64 rounded-lg border border-slate-200 px-4 py-2 text-sm"
+              className="w-64 rounded-lg border border-slate-200 px-4 py-2 text-sm text-black"
             />
             <button
               ref={buttonRef}
