@@ -5,7 +5,7 @@ load_dotenv()   # carrega MONGO_URL e MONGO_DB do .env para os.environ
 import os
 import uuid
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from pydantic import BaseModel, Field
 from pymongo import MongoClient, ReturnDocument
@@ -24,6 +24,7 @@ class Project(BaseModel):
     permissions: List[str] = Field(default_factory=list)
     Texto: str = ""
     branch: str = "main"
+    branches: List[Dict] = Field(default_factory=list)
 
 class MongoDB:
     def __init__(self):
