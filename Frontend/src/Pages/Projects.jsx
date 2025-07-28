@@ -59,51 +59,30 @@ export default function Projects() {
         setMenuOpen(false)
         navigate(`/editor/${data.codigo}`)
       })
-      .catch(() => {
-        setMenuOpen(false)
-        alert('Erro ao criar projeto.')
-      })
+      .catch(() => setMenuOpen(false))
   }
 
-  const handleJoin = e => {
-    e.preventDefault()
-    if (shareCode.trim()) {
-      setMenuOpen(false)
-      navigate(`/editor/${shareCode.trim()}`)
-    }
-  }
-
-  const handleDelete = async (id) => {
-    if (!window.confirm('Tem certeza que deseja excluir este projeto?')) return
-
-    try {
-      const res = await fetch(`http://localhost:8000/api/projects/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      })
-
+  const handleDelete = codigo => {
+    if (!window.confirm('Are you sure you want to delete this project?')) return
+    fetch(`http://localhost:8000/api/documents/${codigo}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    }).then(res => {
       if (res.ok) {
-        setProjects(prev => prev.filter(p => p.id !== id))
-      } else {
-        alert('Erro ao excluir projeto.')
+        setProjects(prev => prev.filter(p => p.codigo !== codigo))
       }
-    } catch (error) {
-      alert('Erro ao excluir projeto.')
-    }
+    })
   }
-
-  const filteredProjects = projects.filter(p =>
-    p.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#625DF5] to-transparent">
       <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-[#625DF5] to-transparent border-b border-slate-200">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-          <Link to="/projects" className="flex items-center gap-4 text-white hover:text-white">
+          <div
+            className="flex items-center gap-4 text-white cursor-pointer"
+            onClick={() => navigate('/projects')}
+          >
             <img
               src={logo}
               alt="Logo"
@@ -193,8 +172,8 @@ export default function Projects() {
                             Edit
                           </button>
                           <button
-                            onClick={() => handleDelete(proj.id)}
                             className="rounded-md bg-red-100 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-200"
+                            onClick={() => handleDelete(proj.codigo)}
                           >
                             Delete
                           </button>

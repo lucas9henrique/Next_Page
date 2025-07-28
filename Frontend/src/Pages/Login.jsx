@@ -34,7 +34,10 @@ function Login() {
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#625DF5] to-transparent p-6">
         <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-2xl">
           <div className="mb-8 flex flex-col items-center">
-          <Link to="/projects" className="mb-4 flex items-center gap-3 text-slate-800 hover:text-slate-800">
+            <div
+              className="mb-4 flex items-center gap-3 text-slate-800 cursor-pointer"
+              onClick={() => navigate('/projects')}
+            >
               <img src={logo} alt="Logo" className="w-20 h-20" />
               <h1 className="text-3xl font-bold tracking-tight">Next_Page</h1>
             </Link>
