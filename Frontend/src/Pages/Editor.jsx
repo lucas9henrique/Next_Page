@@ -61,6 +61,10 @@ function Editor({ editable = true }) {
   const shareRef = useRef(null)
   const shareButtonRef = useRef(null)
   const { userId, token } = useContext(UserContext)
+  const [branches, setBranches] = useState([])
+  const [currentBranch, setCurrentBranch] = useState('main')
+  const [commitMessage, setCommitMessage] = useState('')
+  const [commits, setCommits] = useState([])
 
   /* extensões que o Tiptap deve carregar */
   const extensions = [
@@ -110,8 +114,39 @@ function Editor({ editable = true }) {
     },
   })
 
+  const fetchBranches = useCallback(() => {
+    fetch(`http://localhost:8000/api/branches/${id}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.ok ? res.json() : [])
+      .then(data => {
+        setBranches(Array.isArray(data) ? data : [])
+        if (Array.isArray(data) && data.length && !data.includes(currentBranch)) {
+          setCurrentBranch(data[0])
+        }
+      })
+      .catch(() => {})
+  }, [id, token, currentBranch])
+
+  const fetchHistory = useCallback(() => {
+    fetch(`http://localhost:8000/api/history/${id}?branch=${currentBranch}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.ok ? res.json() : [])
+      .then(data => setCommits(Array.isArray(data) ? data : []))
+      .catch(() => setCommits([]))
+  }, [id, currentBranch, token])
+
   useEffect(() => {
-    fetch(`http://localhost:8000/api/load/${id}`,
+    fetchBranches()
+  }, [fetchBranches])
+
+  useEffect(() => {
+    fetchHistory()
+  }, [fetchHistory])
+
+  useEffect(() => {
+    fetch(`http://localhost:8000/api/load/${id}?branch=${currentBranch}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -127,9 +162,9 @@ function Editor({ editable = true }) {
         }
       })
       .catch(() => { })
-  }, [id, editor])
+  }, [id, currentBranch, editor, token])
 
-  const saveContent = useCallback(() => {
+  const saveContent = useCallback((message) => {
     if (!id) return
     setSaveStatus('saving')
     return fetch(`http://localhost:8000/api/save/${id}`,
@@ -139,7 +174,7 @@ function Editor({ editable = true }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ content, message, branch: currentBranch }),
       })
       .then(res => {
         if (!res.ok) throw new Error('save failed')
@@ -148,7 +183,7 @@ function Editor({ editable = true }) {
       .catch(() => {
         setSaveStatus('error')
       })
-  }, [content, id, token])
+  }, [content, id, token, currentBranch])
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -285,12 +320,32 @@ function Editor({ editable = true }) {
               <select
                 className="form-select flex-1 w-full rounded-md text-slate-800 focus:outline-0 focus:ring-2 focus:ring-blue-500 border border-slate-300 bg-slate-50 focus:border-blue-500 h-11 bg-[image:--select-button-svg] placeholder:text-slate-400 px-3 text-sm"
                 id="current-branch"
+                value={currentBranch}
+                onChange={(e) => { setCurrentBranch(e.target.value) }}
               >
-                <option value="main">main</option>
-                <option value="feature-branch">feature-branch</option>
-                <option value="bugfix-xyz">bugfix-xyz</option>
+                {branches.map(b => (
+                  <option key={b} value={b}>{b}</option>
+                ))}
               </select>
-              <button className="flex items-center gap-1.5 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium tracking-wide border border-slate-300 mt-2">
+              <button
+                onClick={() => {
+                  const name = prompt('New branch name')
+                  if (name) {
+                    fetch('http://localhost:8000/api/branches', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({ document: id, branch: name })
+                    }).then(res => {
+                      if (res.ok) {
+                        fetchBranches()
+                      }
+                    })
+                  }
+                }}
+                className="flex items-center gap-1.5 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium tracking-wide border border-slate-300 mt-2">
                 <span className="material-icons-outlined text-lg">add</span>
                 <span>New</span>
               </button>
@@ -303,38 +358,18 @@ function Editor({ editable = true }) {
             Commit History
           </h3>
           <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
-            <div className="flex items-center gap-3 p-3 rounded-md border border-slate-200 hover:bg-slate-50 transition-colors">
-              <div className="flex-shrink-0 size-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-500">
-                <span className="material-icons-outlined text-xl">history</span>
+            {commits.map(c => (
+              <div key={c.hash} className="flex items-center gap-3 p-3 rounded-md border border-slate-200 hover:bg-slate-50 transition-colors">
+                <div className="flex-shrink-0 size-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-500">
+                  <span className="material-icons-outlined text-xl">history</span>
+                </div>
+                <div className="flex-1">
+                  <p className="text-slate-800 text-sm font-medium line-clamp-1">{c.message}</p>
+                  <p className="text-slate-500 text-xs line-clamp-1">Author: {c.author}</p>
+                </div>
+                <p className="text-slate-500 text-xs shrink-0">{new Date(c.timestamp).toLocaleString()}</p>
               </div>
-              <div className="flex-1">
-                <p className="text-slate-800 text-sm font-medium line-clamp-1">Initial commit</p>
-                <p className="text-slate-500 text-xs line-clamp-1">Author: Alex Bennett</p>
-              </div>
-              <p className="text-slate-500 text-xs shrink-0">2 days ago</p>
-            </div>
-            <div className="flex items-center gap-3 p-3 rounded-md border border-slate-200 hover:bg-slate-50 transition-colors">
-              <div className="flex-shrink-0 size-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-500">
-                <span className="material-icons-outlined text-xl">history</span>
-              </div>
-              <div className="flex-1">
-                <p className="text-slate-800 text-sm font-medium line-clamp-1">
-                  Added features section
-                </p>
-                <p className="text-slate-500 text-xs line-clamp-1">Author: Sophia Carter</p>
-              </div>
-              <p className="text-slate-500 text-xs shrink-0">1 day ago</p>
-            </div>
-            <div className="flex items-center gap-3 p-3 rounded-md border border-slate-200 hover:bg-slate-50 transition-colors">
-              <div className="flex-shrink-0 size-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-500">
-                <span className="material-icons-outlined text-xl">history</span>
-              </div>
-              <div className="flex-1">
-                <p className="text-slate-800 text-sm font-medium line-clamp-1">Updated documentation</p>
-                <p className="text-slate-500 text-xs line-clamp-1">Author: Alex Bennett</p>
-              </div>
-              <p className="text-slate-500 text-xs shrink-0">1 hour ago</p>
-            </div>
+            ))}
           </div>
         </section>
 
@@ -354,10 +389,18 @@ function Editor({ editable = true }) {
                 className="form-input w-full rounded-md text-slate-800 focus:outline-0 focus:ring-2 focus:ring-blue-500 border border-slate-300 bg-slate-50 focus:border-blue-500 h-11 placeholder:text-slate-400 px-3 text-sm"
                 id="commit-message"
                 placeholder="Enter your commit message"
-                defaultValue=""
+                value={commitMessage}
+                onChange={(e) => setCommitMessage(e.target.value)}
               />
             </div>
-            <button className="flex w-full items-center gap-2 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium tracking-wide shadow-sm transition-colors">
+            <button
+              onClick={() => {
+                saveContent(commitMessage).then(() => {
+                  setCommitMessage('')
+                  fetchHistory()
+                })
+              }}
+              className="flex w-full items-center gap-2 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium tracking-wide shadow-sm transition-colors">
               <span className="material-icons-outlined text-lg">check_circle</span>
               <span>Commit Changes</span>
             </button>
@@ -368,7 +411,26 @@ function Editor({ editable = true }) {
           <h3 className="text-slate-800 text-lg font-semibold pb-3 border-b border-slate-200 mb-3">
             Merge Branches
           </h3>
-          <button className="flex w-full items-center gap-2 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium tracking-wide border border-slate-300">
+          <button
+            onClick={() => {
+              const source = prompt(`Merge which branch into ${currentBranch}?`)
+              if (source) {
+                fetch('http://localhost:8000/api/merge', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                  },
+                  body: JSON.stringify({ document: id, source, target: currentBranch })
+                }).then(res => {
+                  if (res.ok) {
+                    fetchHistory()
+                    fetchBranches()
+                  }
+                })
+              }
+            }}
+            className="flex w-full items-center gap-2 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium tracking-wide border border-slate-300">
             <span className="material-icons-outlined text-lg">merge_type</span>
             <span>Merge Branch</span>
           </button>
@@ -411,7 +473,9 @@ function Editor({ editable = true }) {
                 />
               </button>
               <button
-                onClick={saveContent}
+                onClick={() => {
+                  saveContent().then(fetchHistory)
+                }}
                 className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"           >
                 <img
                   src={save}
