@@ -434,3 +434,58 @@ def commit_history(
             "diff": diff,
         })
     return commits
+
+@app.websocket("/ws/{codigo_documento}")
+async def websocket_endpoint(
+    websocket: WebSocket,
+    codigo_documento: str,
+    token: str,
+    mongo: MongoDB = Depends(get_mongo),
+):
+    # 1. Authentication and Authorization (your code is already correct)
+    try:
+        email = verify_token(HTTPAuthorizationCredentials(scheme="Bearer", credentials=token))
+        proj = mongo.get_project(codigo_documento)
+        if not proj or not has_access(proj, email):
+            await websocket.close(code=1008) # Policy Violation
+            return
+    except Exception:
+        await websocket.close(code=1008)
+        return
+
+    # 2. Accept connection and send initial state (your code is already correct)
+    await websocket.accept()
+    active_connections[codigo_documento].append(websocket)
+    try:
+        repo_path = os.path.join(REPOS_ROOT, codigo_documento)
+        file_path = os.path.join(repo_path, "document.txt")
+        content = open(file_path, "r", encoding="utf-8").read() if os.path.exists(file_path) else ""
+        await websocket.send_text(content)
+    except Exception as e:
+        print(f"Error loading initial content: {e}")
+        await websocket.send_text("") 
+
+    # 3. Communication loop with persistence
+    try:
+        while True:
+            new_text = await websocket.receive_text()
+
+            # Broadcast to other clients
+            for connection in active_connections[codigo_documento]:
+                if connection is not websocket: 
+                    await connection.send_text(new_text)
+            
+            # CHANGE 1: Persist the change to the file
+            try:
+                file_path = os.path.join(REPOS_ROOT, codigo_documento, "document.txt")
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(new_text)
+            except Exception as e:
+                print(f"CRITICAL ERROR: Failed to save file via WebSocket. Error: {e}")
+
+    except WebSocketDisconnect:
+        # CHANGE 2: Enhanced cleanup
+        active_connections[codigo_documento].remove(websocket)
+        if not active_connections[codigo_documento]:
+            del active_connections[codigo_documento]
+            print(f"All connections for document {codigo_documento} have been closed.")
