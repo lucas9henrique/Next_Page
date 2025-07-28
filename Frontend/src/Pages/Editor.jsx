@@ -177,7 +177,12 @@ function Editor({ editable = true }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ content, message, branch: currentBranch }),
+        body: JSON.stringify({
+          content,
+          message,
+          branch: currentBranch,
+          title,
+        }),
       })
       .then(res => {
         if (!res.ok) throw new Error('save failed')
@@ -186,7 +191,7 @@ function Editor({ editable = true }) {
       .catch(() => {
         setSaveStatus('error')
       })
-  }, [content, id, token, currentBranch])
+  }, [content, id, token, currentBranch, title])
 
   useEffect(() => {
     const handler = setTimeout(() => {

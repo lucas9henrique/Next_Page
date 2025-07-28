@@ -280,10 +280,14 @@ async def save_document(
             repo.index.commit(data.message or "Update",
                               author=actor, committer=actor)
 
-    # mongo.update_project(document, {"Texto": data.content})
     update_fields: dict[str, str] = {"Texto": data.content}
     if data.title is not None:
         update_fields["nomeProjeto"] = data.title
+
+    # Persist updated text and optional title in MongoDB
+    if update_fields:
+        mongo.update_project(document, update_fields)
+
     return {"msg": "Document saved"}
 
 
