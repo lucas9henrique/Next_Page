@@ -9,7 +9,7 @@ export default function Projects() {
   const [shareCode, setShareCode] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [isLoading, setIsLoading] = useState(true)
-  const { userId, token } = useContext(UserContext)
+  const { userId, token, logout } = useContext(UserContext)
   const navigate = useNavigate()
   const menuRef = useRef(null)
   const buttonRef = useRef(null)
@@ -119,6 +119,12 @@ export default function Projects() {
                   'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCB6kVfzkQcBJF-8Zr1op7XJrlSN3T2Agi9wDUjMD68R0N8sGPe8esmtrBe0JADQKJJNPDaHqftmNjQc8WBlB0yIBrHYinma-jSOvQDGlZBAastI2-ktuyE8nMxLq5J0CTRHeom7baiN7PQ7AYWJUFmlpj66JHXQDEE066jct78l4twgYMkhwRWT6GpqeEOC6q9iCo35PZQjyoz9L468FVYYBWX4zFUL-hLHYCiWpt4P_DwAMPsipIFakokvPswucCpsbF-6Efpk7xl")',
               }}
             />
+            <button
+              onClick={() => { logout(); navigate('/') }}
+              className="rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white hover:bg-red-600"
+            >
+              Logout
+            </button>
           </div>
         </div>
       </header>
