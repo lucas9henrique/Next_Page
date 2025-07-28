@@ -57,6 +57,7 @@ function Editor({ editable = true }) {
   const [saveStatus, setSaveStatus] = useState('idle')
   const [shareCode, setShareCode] = useState('')
   const [shareOpen, setShareOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const shareRef = useRef(null)
   const shareButtonRef = useRef(null)
   const { userId, token } = useContext(UserContext)
@@ -234,6 +235,146 @@ function Editor({ editable = true }) {
     };
   return (
     <div className="bg-slate-100" style={pageStyle}>
+      {/* Botão fixo para abrir/fechar sidebar */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="fixed top-20 left-4 z-[1001] rounded-md bg-blue-600 p-2 text-white shadow-md transition-colors hover:bg-blue-700 flex items-center justify-center"
+        aria-label={sidebarOpen ? 'Fechar sidebar' : 'Abrir sidebar'}
+      >
+        {/* Ícone hamburguer e X */}
+        {sidebarOpen ? (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        )}
+      </button>
+
+      {/* Overlay escurecido atrás da sidebar */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-40 z-[1000] transition-opacity"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar fixa sobreposta */}
+      <aside
+        className={`fixed top-0 left-0 h-full bg-white border-r border-slate-200 shadow-2xl p-6 overflow-y-auto transition-transform duration-300 ease-in-out z-[1002]`}
+        style={{
+          width: 480,
+          transform: sidebarOpen ? 'translateX(0)' : 'translateX(-480px)',
+        }}
+      >
+        <section>
+          <h2 className="text-slate-800 text-xl font-bold pb-4 border-b border-slate-200 mb-4">
+            Git Control
+          </h2>
+          <div className="space-y-4">
+            <div>
+              <label
+                className="block text-slate-700 text-sm font-medium pb-1.5"
+                htmlFor="current-branch"
+              >
+                Current Branch
+              </label>
+              <select
+                className="form-select flex-1 w-full rounded-md text-slate-800 focus:outline-0 focus:ring-2 focus:ring-blue-500 border border-slate-300 bg-slate-50 focus:border-blue-500 h-11 bg-[image:--select-button-svg] placeholder:text-slate-400 px-3 text-sm"
+                id="current-branch"
+              >
+                <option value="main">main</option>
+                <option value="feature-branch">feature-branch</option>
+                <option value="bugfix-xyz">bugfix-xyz</option>
+              </select>
+              <button className="flex items-center gap-1.5 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium tracking-wide border border-slate-300 mt-2">
+                <span className="material-icons-outlined text-lg">add</span>
+                <span>New</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3 className="text-slate-800 text-lg font-semibold pb-3 border-b border-slate-200 mb-3">
+            Commit History
+          </h3>
+          <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
+            <div className="flex items-center gap-3 p-3 rounded-md border border-slate-200 hover:bg-slate-50 transition-colors">
+              <div className="flex-shrink-0 size-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-500">
+                <span className="material-icons-outlined text-xl">history</span>
+              </div>
+              <div className="flex-1">
+                <p className="text-slate-800 text-sm font-medium line-clamp-1">Initial commit</p>
+                <p className="text-slate-500 text-xs line-clamp-1">Author: Alex Bennett</p>
+              </div>
+              <p className="text-slate-500 text-xs shrink-0">2 days ago</p>
+            </div>
+            <div className="flex items-center gap-3 p-3 rounded-md border border-slate-200 hover:bg-slate-50 transition-colors">
+              <div className="flex-shrink-0 size-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-500">
+                <span className="material-icons-outlined text-xl">history</span>
+              </div>
+              <div className="flex-1">
+                <p className="text-slate-800 text-sm font-medium line-clamp-1">
+                  Added features section
+                </p>
+                <p className="text-slate-500 text-xs line-clamp-1">Author: Sophia Carter</p>
+              </div>
+              <p className="text-slate-500 text-xs shrink-0">1 day ago</p>
+            </div>
+            <div className="flex items-center gap-3 p-3 rounded-md border border-slate-200 hover:bg-slate-50 transition-colors">
+              <div className="flex-shrink-0 size-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-500">
+                <span className="material-icons-outlined text-xl">history</span>
+              </div>
+              <div className="flex-1">
+                <p className="text-slate-800 text-sm font-medium line-clamp-1">Updated documentation</p>
+                <p className="text-slate-500 text-xs line-clamp-1">Author: Alex Bennett</p>
+              </div>
+              <p className="text-slate-500 text-xs shrink-0">1 hour ago</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3 className="text-slate-800 text-lg font-semibold pb-3 border-b border-slate-200 mb-3">
+            Commit Changes
+          </h3>
+          <div className="space-y-3">
+            <div>
+              <label
+                className="block text-slate-700 text-sm font-medium pb-1.5"
+                htmlFor="commit-message"
+              >
+                Commit Message
+              </label>
+              <input
+                className="form-input w-full rounded-md text-slate-800 focus:outline-0 focus:ring-2 focus:ring-blue-500 border border-slate-300 bg-slate-50 focus:border-blue-500 h-11 placeholder:text-slate-400 px-3 text-sm"
+                id="commit-message"
+                placeholder="Enter your commit message"
+                defaultValue=""
+              />
+            </div>
+            <button className="flex w-full items-center gap-2 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium tracking-wide shadow-sm transition-colors">
+              <span className="material-icons-outlined text-lg">check_circle</span>
+              <span>Commit Changes</span>
+            </button>
+          </div>
+        </section>
+
+        <section>
+          <h3 className="text-slate-800 text-lg font-semibold pb-3 border-b border-slate-200 mb-3">
+            Merge Branches
+          </h3>
+          <button className="flex w-full items-center gap-2 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium tracking-wide border border-slate-300">
+            <span className="material-icons-outlined text-lg">merge_type</span>
+            <span>Merge Branch</span>
+          </button>
+        </section>
+      </aside>
+
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#625DF5] to-transparent p-6">
         <header className="w-full max-w-4xl flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 bg-transparent px-6 py-3 shadow-sm mb-6 rounded-t-xl">
           <div className="flex items-center gap-3 text-white">
