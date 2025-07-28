@@ -60,6 +60,7 @@ function Editor({ editable = true }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const shareRef = useRef(null)
   const shareButtonRef = useRef(null)
+  const [title, setTitle] = useState('Título do Documento')
   const { userId, token } = useContext(UserContext)
   const [branches, setBranches] = useState([])
   const [currentBranch, setCurrentBranch] = useState('main')
@@ -125,7 +126,7 @@ function Editor({ editable = true }) {
           setCurrentBranch(data[0])
         }
       })
-      .catch(() => {})
+      .catch(() => { })
   }, [id, token, currentBranch])
 
   const fetchHistory = useCallback(() => {
@@ -156,7 +157,9 @@ function Editor({ editable = true }) {
       .then((res) => res.ok ? res.json() : Promise.reject(res))
       .then((data) => {
         const html = data.content || ''
+        const loadedTitle = data.title || 'Título do Documento'
         setContent(html)
+        setTitle(loadedTitle)
         if (editor) {
           editor.commands.setContent(html)
         }
@@ -247,27 +250,27 @@ function Editor({ editable = true }) {
     }
   }
   const handleJoin = async () => {
-      try {
-        const response = await fetch(`http://localhost:8000/api/documents/${id}/add_user`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ email: shareCode.trim()})
-        });
-    
-        if (!response.ok) {
-          throw new Error('Erro ao adicionar usuário');
-        }
-        else{
-          setShareOpen(false)
-        }
-      } catch (err) {
-        console.error('Erro ao adicionar usuário:', err);
-        alert('Não foi possível adicionar o usuário.');
+    try {
+      const response = await fetch(`http://localhost:8000/api/documents/${id}/add_user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ email: shareCode.trim() })
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao adicionar usuário');
       }
-    };
+      else {
+        setShareOpen(false)
+      }
+    } catch (err) {
+      console.error('Erro ao adicionar usuário:', err);
+      alert('Não foi possível adicionar o usuário.');
+    }
+  };
   return (
     <div className="bg-slate-100" style={pageStyle}>
       {/* Botão fixo para abrir/fechar sidebar */}
@@ -346,7 +349,7 @@ function Editor({ editable = true }) {
                   }
                 }}
                 className="flex items-center gap-1.5 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium tracking-wide border border-slate-300 mt-2">
-                <span className="material-icons-outlined text-lg">add</span>
+                <span className="material-icons-outlined text-lg"></span>
                 <span>New</span>
               </button>
             </div>
@@ -401,7 +404,7 @@ function Editor({ editable = true }) {
                 })
               }}
               className="flex w-full items-center gap-2 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium tracking-wide shadow-sm transition-colors">
-              <span className="material-icons-outlined text-lg">check_circle</span>
+              <span className="material-icons-outlined text-lg"></span>
               <span>Commit Changes</span>
             </button>
           </div>
@@ -431,7 +434,7 @@ function Editor({ editable = true }) {
               }
             }}
             className="flex w-full items-center gap-2 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium tracking-wide border border-slate-300">
-            <span className="material-icons-outlined text-lg">merge_type</span>
+            <span className="material-icons-outlined text-lg"></span>
             <span>Merge Branch</span>
           </button>
         </section>
@@ -585,6 +588,7 @@ function Editor({ editable = true }) {
                 ))}
               </div>
             </div>
+
             {/* salvamento */}
             <div className="flex items-center gap-2 text-sm">
               {saveStatus === 'saving' && (
@@ -618,9 +622,19 @@ function Editor({ editable = true }) {
                 />
               )}
             </div>
-
-            {/* editor de texto */}
           </div>
+          {/* Título do documento */}
+          <label htmlFor="doc-title" className="mb-1 text-lg font-semibold text-gray-700 select-none">
+            </label>
+            <input
+              id="doc-title"
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Digite o título do documento"
+              className="mb-6 text-3xl font-bold outline-none border-none w-full px-2 py-1 text-gray-800 placeholder-gray-400 bg-transparent"
+            />
+          {/* editor de texto */}
           <EditorContent editor={editor} className="w-full h-full outline-none text-black flex-grow p-10" />
         </div>
 

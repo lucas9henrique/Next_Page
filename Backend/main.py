@@ -97,6 +97,7 @@ class DocumentData(BaseModel):
     content: str
     message: str | None = None
     branch: str | None = None
+    title: str | None = None
 
 class BranchData(BaseModel):
     document: str
@@ -279,8 +280,13 @@ async def save_document(
             repo.index.commit(data.message or "Update",
                               author=actor, committer=actor)
 
-    mongo.update_project(document, {"Texto": data.content})
+    # mongo.update_project(document, {"Texto": data.content})
+    update_fields: dict[str, str] = {"Texto": data.content}
+    if data.title is not None:
+        update_fields["nomeProjeto"] = data.title
     return {"msg": "Document saved"}
+
+
 
 @app.get("/api/load/{document}")
 def load_document(
@@ -289,18 +295,35 @@ def load_document(
     mongo: MongoDB = Depends(get_mongo),
     email: str = Depends(verify_token),
 ):
+    # busca o projeto no Mongo
     proj = mongo.get_project(document)
     if not proj or not has_access(proj, email):
-        raise HTTPException(404, "Document not found")
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    # monta o path do repositório e faz checkout
     path = os.path.join(REPOS_ROOT, document)
     remove_git_lock(path)
     repo = Repo(path)
     ref = branch or "main"
     if ref in repo.heads:
         repo.git.checkout(ref)
+
+    # lê o conteúdo do arquivo
     file_path = os.path.join(path, "document.txt")
-    content = open(file_path, "r", encoding="utf-8").read() if os.path.exists(file_path) else ""
-    return {"content": content}
+    content = ""
+    if os.path.exists(file_path):
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+    # aqui pegamos o título do projeto vindo do MongoDB
+    # supondo que o campo se chame "nomeProjeto"
+    title = proj.get("nomeProjeto", "Título do Documento")
+
+    # retornamos ambos
+    return {
+        "content": content,
+        "title": title,
+    }
 
 @app.post("/api/documents/{codigo}/remove_user")
 def remove_user_from_document(
