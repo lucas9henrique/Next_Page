@@ -1,72 +1,76 @@
-import { useState, useEffect, useContext, useCallback, useRef } from 'react'
-import { useEditor, EditorContent } from '@tiptap/react'
-import TextAlign from '@tiptap/extension-text-align'
-import { useParams, useNavigate, Link } from 'react-router-dom'
-import StarterKit from '@tiptap/starter-kit'
-import Italic from '@tiptap/extension-italic'
-import Heading from '@tiptap/extension-heading'
-import BulletList from '@tiptap/extension-bullet-list'
-import OrderedList from '@tiptap/extension-ordered-list'
-import ListItem from '@tiptap/extension-list-item'
-import Underline from './Underline'
-import { UserContext } from './UserContext.jsx'
-import PaginationExtension, { PageNode, HeaderFooterNode, BodyNode } from "tiptap-extension-pagination";
+import { useState, useEffect, useContext, useCallback, useRef } from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import TextAlign from "@tiptap/extension-text-align";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import StarterKit from "@tiptap/starter-kit";
+import Italic from "@tiptap/extension-italic";
+import Heading from "@tiptap/extension-heading";
+import BulletList from "@tiptap/extension-bullet-list";
+import OrderedList from "@tiptap/extension-ordered-list";
+import ListItem from "@tiptap/extension-list-item";
+import Underline from "./Underline";
+import { UserContext } from "./UserContext.jsx";
+import PaginationExtension, {
+  PageNode,
+  HeaderFooterNode,
+  BodyNode,
+} from "tiptap-extension-pagination";
 // Imagens
 // — Geral
-import logo from '../assets/logo1.png';
-import loaderGif from '../assets/loader.gif';
-import cloudIcon from '../assets/cloud.png';
-import cloudOffIcon from '../assets/cloud-off.png';
+import logo from "../assets/logo1.png";
+import loaderGif from "../assets/loader.gif";
+import cloudIcon from "../assets/cloud.png";
+import cloudOffIcon from "../assets/cloud-off.png";
 // — Ações de edição
-import redo from '../assets/redo.png';
-import save from '../assets/save.png';
-import undo from '../assets/undo.png';
-import share from '../assets/compartilhar.png';
+import redo from "../assets/redo.png";
+import save from "../assets/save.png";
+import undo from "../assets/undo.png";
+import share from "../assets/compartilhar.png";
 // — Alinhamento de texto
-import center_align from '../assets/center-align.png';
-import just_align from '../assets/justification.png';
-import left_align from '../assets/left-align.png';
-import right_align from '../assets/right-align.png';
+import center_align from "../assets/center-align.png";
+import just_align from "../assets/justification.png";
+import left_align from "../assets/left-align.png";
+import right_align from "../assets/right-align.png";
 // — Estilo de fonte
-import bold_font from '../assets/bold.png';
-import italic_font from '../assets/italic.png';
-import underline_font from '../assets/underline.png';
+import bold_font from "../assets/bold.png";
+import italic_font from "../assets/italic.png";
+import underline_font from "../assets/underline.png";
 
-const pageStyle = { fontFamily: '"Roboto", "Noto Sans", sans-serif' }
+const pageStyle = { fontFamily: '"Roboto", "Noto Sans", sans-serif' };
 const avatarStyle = {
   backgroundImage:
     'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDm3TJQ2bsuTFWymc2Zk_ul_UFNWm9sNykIz-NMHhL0PoS12Fi486mWOZAn3_x22WDH8S0e4rhwVEmLCTpnn9njxyHcw1I_XeGkUReoLJH4uU6tSBqiAHt9mt0NycVBgx6EjInl8KMxpeLk83j0Y_FpT2REm6zfpNrhd_kVJvxKm2NU8HqgCSs0y84v--Shy1_kE_ZEqg1e8a22HZDG4b8vqbjg12BnuFRUk1gaNbl5ySWLhWKtgGNSnf6NVQhfHyjeDroohmI8BH5_")',
-}
+};
 
 const alignButtons = [
-  { img: left_align, alt: 'Alinhar à esquerda', action: 'alignLeft' },
-  { img: center_align, alt: 'Centralizar texto', action: 'alignCenter' },
-  { img: right_align, alt: 'Alinhar à direita', action: 'alignRight' },
-  { img: just_align, alt: 'Justificar texto', action: 'alignJustify' },
-]
+  { img: left_align, alt: "Alinhar à esquerda", action: "alignLeft" },
+  { img: center_align, alt: "Centralizar texto", action: "alignCenter" },
+  { img: right_align, alt: "Alinhar à direita", action: "alignRight" },
+  { img: just_align, alt: "Justificar texto", action: "alignJustify" },
+];
 
 const styleButtons = [
-  { img: bold_font, alt: 'Negrito', action: 'bold' },
-  { img: italic_font, alt: 'Itálico', action: 'italic' },
-  { img: underline_font, alt: 'Sublinhar', action: 'underline' },
-]
+  { img: bold_font, alt: "Negrito", action: "bold" },
+  { img: italic_font, alt: "Itálico", action: "italic" },
+  { img: underline_font, alt: "Sublinhar", action: "underline" },
+];
 
 function Editor({ editable = true }) {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const [content, setContent] = useState('')
-  const [title, setTitle] = useState('Título do Documento')
-  const [saveStatus, setSaveStatus] = useState('idle')
-  const [shareCode, setShareCode] = useState('')
-  const [shareOpen, setShareOpen] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const shareRef = useRef(null)
-  const shareButtonRef = useRef(null)
-  const { userId, token } = useContext(UserContext)
-  const [branches, setBranches] = useState([])
-  const [currentBranch, setCurrentBranch] = useState('main')
-  const [commitMessage, setCommitMessage] = useState('')
-  const [commits, setCommits] = useState([])
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [content, setContent] = useState("");
+  const [title, setTitle] = useState("Título do Documento");
+  const [saveStatus, setSaveStatus] = useState("idle");
+  const [shareCode, setShareCode] = useState("");
+  const [shareOpen, setShareOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const shareRef = useRef(null);
+  const shareButtonRef = useRef(null);
+  const { userId, token } = useContext(UserContext);
+  const [branches, setBranches] = useState([]);
+  const [currentBranch, setCurrentBranch] = useState("main");
+  const [commitMessage, setCommitMessage] = useState("");
+  const [commits, setCommits] = useState([]);
 
   // Extensões do Tiptap
   const extensions = [
@@ -78,17 +82,17 @@ function Editor({ editable = true }) {
       listItem: false,
     }),
     Italic.configure({
-      HTMLAttributes: { class: 'italic' },
+      HTMLAttributes: { class: "italic" },
     }),
     Heading.configure({
       levels: [1, 2, 3],
-      HTMLAttributes: { class: 'text-2xl font-semibold' },
+      HTMLAttributes: { class: "text-2xl font-semibold" },
     }),
     BulletList.configure({
-      HTMLAttributes: { class: 'list-disc list-outside pl-5 my-2' },
+      HTMLAttributes: { class: "list-disc list-outside pl-5 my-2" },
     }),
     OrderedList.configure({
-      HTMLAttributes: { class: 'list-decimal list-outside pl-5 my-2' },
+      HTMLAttributes: { class: "list-decimal list-outside pl-5 my-2" },
     }),
     ListItem,
     Underline,
@@ -100,109 +104,154 @@ function Editor({ editable = true }) {
       BorderConfig: { top: 0, right: 0, bottom: 0, left: 0 },
     }),
     TextAlign.configure({
-      types: ['paragraph', 'heading'],
+      types: ["paragraph", "heading"],
     }),
     PageNode,
     HeaderFooterNode,
     BodyNode,
-  ]
+  ];
+
+  // ADICIONADO: Refs para o WebSocket e para controle de atualizações
+  const socketRef = useRef(null);
+  const isUpdatingFromRemote = useRef(false);
 
   const editor = useEditor({
     extensions,
-    content,
+    content: "<p>Conectando...</p>", // Conteúdo inicial
     editable,
+    // MUDANÇA: onUpdate agora envia o conteúdo via WebSocket
     onUpdate({ editor }) {
-      setContent(editor.getHTML())
+      // Se a mudança veio de outro usuário, não a envie de volta para o servidor.
+      if (isUpdatingFromRemote.current) {
+        return;
+      }
+
+      const html = editor.getHTML();
+      if (
+        socketRef.current &&
+        socketRef.current.readyState === WebSocket.OPEN
+      ) {
+        socketRef.current.send(html);
+      }
     },
-  })
+  });
 
   const fetchBranches = useCallback(() => {
     fetch(`http://localhost:8000/api/branches/${id}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     })
-      .then(res => res.ok ? res.json() : [])
-      .then(data => {
-        setBranches(Array.isArray(data) ? data : [])
-        if (Array.isArray(data) && data.length && !data.includes(currentBranch)) {
-          setCurrentBranch(data[0])
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        setBranches(Array.isArray(data) ? data : []);
+        if (
+          Array.isArray(data) &&
+          data.length &&
+          !data.includes(currentBranch)
+        ) {
+          setCurrentBranch(data[0]);
         }
       })
-      .catch(() => { })
-  }, [id, token, currentBranch])
+      .catch(() => {});
+  }, [id, token, currentBranch]);
 
   const fetchHistory = useCallback(() => {
     fetch(`http://localhost:8000/api/history/${id}?branch=${currentBranch}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     })
-      .then(res => res.ok ? res.json() : [])
-      .then(data => setCommits(Array.isArray(data) ? data : []))
-      .catch(() => setCommits([]))
-  }, [id, currentBranch, token])
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => setCommits(Array.isArray(data) ? data : []))
+      .catch(() => setCommits([]));
+  }, [id, currentBranch, token]);
 
   useEffect(() => {
-    fetchBranches()
-  }, [fetchBranches])
+    fetchBranches();
+  }, [fetchBranches]);
 
   useEffect(() => {
-    fetchHistory()
-  }, [fetchHistory])
+    fetchHistory();
+  }, [fetchHistory]);
 
-  useEffect(() => {
-    fetch(`http://localhost:8000/api/load/${id}?branch=${currentBranch}`,
-      {
+  // MUDANÇA: A função agora pega o conteúdo direto do editor.
+  const saveContent = useCallback(
+    (message) => {
+      if (!id || !editor) return; // Verifica se o editor existe
+
+      const currentContent = editor.getHTML(); // Pega o HTML mais recente
+
+      setSaveStatus("saving");
+      return fetch(`http://localhost:8000/api/save/${id}`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        }
-      })
-      .then((res) => res.ok ? res.json() : Promise.reject(res))
-      .then((data) => {
-        const html = data.content || ''
-        const loadedTitle = data.title || 'Título do Documento'
-        setContent(html)
-        setTitle(loadedTitle)
-        if (editor) {
-          editor.commands.setContent(html)
-        }
-      })
-      .catch(() => { })
-  }, [id, currentBranch, editor, token])
-
-  const saveContent = useCallback((message) => {
-    if (!id) return
-    setSaveStatus('saving')
-    return fetch(`http://localhost:8000/api/save/${id}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          content,
+          content: currentContent, // Usa o conteúdo pego do editor
           message,
           branch: currentBranch,
           title,
         }),
       })
-      .then(res => {
-        if (!res.ok) throw new Error('save failed')
-        setSaveStatus('saved')
-      })
-      .catch(() => {
-        setSaveStatus('error')
-      })
-  }, [content, id, token, currentBranch, title])
+        .then((res) => {
+          if (!res.ok) throw new Error("save failed");
+          setSaveStatus("saved");
+          fetchHistory(); // Atualiza o histórico de commits após salvar
+        })
+        .catch(() => {
+          setSaveStatus("error");
+        });
+    },
+    [id, token, editor, currentBranch, title, fetchHistory]
+  ); // Adiciona 'editor' e 'fetchHistory' às dependências
+
+  // ADICIONADO: useEffect para gerenciar a conexão WebSocket
+  useEffect(() => {
+    if (!id || !token || !editor) {
+      return;
+    }
+
+    const wsUrl = `ws://localhost:8000/ws/${id}?token=${token}`;
+    const ws = new WebSocket(wsUrl);
+    socketRef.current = ws;
+
+    ws.onopen = () => {
+      console.log("Conectado ao servidor de colaboração!");
+      setSaveStatus("saved"); // Indica que a conexão em tempo real está ativa
+    };
+
+    ws.onmessage = (event) => {
+      const remoteHtml = event.data;
+
+      if (editor.getHTML() !== remoteHtml) {
+        isUpdatingFromRemote.current = true;
+        editor.commands.setContent(remoteHtml, false);
+        setTimeout(() => {
+          isUpdatingFromRemote.current = false;
+        }, 50);
+      }
+    };
+
+    ws.onclose = () => {
+      console.log("Desconectado do servidor de colaboração.");
+      setSaveStatus("error");
+    };
+
+    ws.onerror = (err) => {
+      console.error("Erro no WebSocket:", err);
+      setSaveStatus("error");
+    };
+
+    return () => {
+      if (ws) {
+        ws.close();
+      }
+    };
+    // MUDANÇA: A dependência de `currentBranch` foi removida daqui, pois o WebSocket
+    // sempre trabalha com o estado "ao vivo", que é então commitado para uma branch.
+  }, [id, token, editor]);
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      saveContent()
-    }, 1000)
-    return () => clearTimeout(handler)
-  }, [content, saveContent])
-
-  useEffect(() => {
-    if (!shareOpen) return
+    if (!shareOpen) return;
     function handleOutside(event) {
       if (
         shareRef.current &&
@@ -210,71 +259,73 @@ function Editor({ editable = true }) {
         shareButtonRef.current &&
         !shareButtonRef.current.contains(event.target)
       ) {
-        setShareOpen(false)
+        setShareOpen(false);
       }
     }
-    document.addEventListener('mousedown', handleOutside)
-    return () => document.removeEventListener('mousedown', handleOutside)
-  }, [shareOpen])
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [shareOpen]);
 
   const handleAction = (type) => {
-    if (!editor) return
-    const chain = editor.chain().focus()
+    if (!editor) return;
+    const chain = editor.chain().focus();
     switch (type) {
-      case 'bold':
-        chain.toggleBold().run()
-        break
-      case 'italic':
-        chain.toggleItalic().run()
-        break
-      case 'underline':
-        chain.toggleUnderline().run()
-        break
-      case 'heading2':
-        chain.toggleHeading({ level: 2 }).run()
-        break
-      case 'bulletList':
-        chain.toggleBulletList().run()
-        break
-      case 'orderedList':
-        chain.toggleOrderedList().run()
-        break
-      case 'alignLeft':
-        chain.setTextAlign('left').run()
-        break
-      case 'alignCenter':
-        chain.setTextAlign('center').run()
-        break
-      case 'alignRight':
-        chain.setTextAlign('right').run()
-        break
-      case 'alignJustify':
-        chain.setTextAlign('justify').run()
-        break
+      case "bold":
+        chain.toggleBold().run();
+        break;
+      case "italic":
+        chain.toggleItalic().run();
+        break;
+      case "underline":
+        chain.toggleUnderline().run();
+        break;
+      case "heading2":
+        chain.toggleHeading({ level: 2 }).run();
+        break;
+      case "bulletList":
+        chain.toggleBulletList().run();
+        break;
+      case "orderedList":
+        chain.toggleOrderedList().run();
+        break;
+      case "alignLeft":
+        chain.setTextAlign("left").run();
+        break;
+      case "alignCenter":
+        chain.setTextAlign("center").run();
+        break;
+      case "alignRight":
+        chain.setTextAlign("right").run();
+        break;
+      case "alignJustify":
+        chain.setTextAlign("justify").run();
+        break;
       default:
-        break
+        break;
     }
-  }
+  };
   const handleJoin = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/documents/${id}/add_user`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ email: shareCode.trim() })
-      });
+      const response = await fetch(
+        `http://localhost:8000/api/documents/${id}/add_user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ email: shareCode.trim() }),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Erro ao adicionar usuário');
-      }
-      else {
-        setShareOpen(false)
+        throw new Error("Erro ao adicionar usuário");
+      } else {
+        setShareOpen(false);
       }
     } catch (err) {
-      console.error('Erro ao adicionar usuário:', err);
-      alert('Não foi possível adicionar o usuário.');
+      console.error("Erro ao adicionar usuário:", err);
+      alert("Não foi possível adicionar o usuário.");
     }
   };
   return (
@@ -283,16 +334,38 @@ function Editor({ editable = true }) {
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
         className="fixed top-20 left-4 z-[1001] rounded-md bg-blue-600 p-2 text-white shadow-md transition-colors hover:bg-blue-700 flex items-center justify-center"
-        aria-label={sidebarOpen ? 'Fechar sidebar' : 'Abrir sidebar'}
+        aria-label={sidebarOpen ? "Fechar sidebar" : "Abrir sidebar"}
       >
         {/* Ícone hamburguer e X */}
         {sidebarOpen ? (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
           </svg>
         )}
       </button>
@@ -311,7 +384,7 @@ function Editor({ editable = true }) {
         className={`fixed top-0 left-0 h-full bg-white border-r border-slate-200 shadow-2xl p-6 overflow-y-auto transition-transform duration-300 ease-in-out z-[1002]`}
         style={{
           width: 480,
-          transform: sidebarOpen ? 'translateX(0)' : 'translateX(-480px)',
+          transform: sidebarOpen ? "translateX(0)" : "translateX(-480px)",
         }}
       >
         <section>
@@ -330,31 +403,36 @@ function Editor({ editable = true }) {
                 className="form-select flex-1 w-full rounded-md text-slate-800 focus:outline-0 focus:ring-2 focus:ring-blue-500 border border-slate-300 bg-slate-50 focus:border-blue-500 h-11 bg-[image:--select-button-svg] placeholder:text-slate-400 px-3 text-sm"
                 id="current-branch"
                 value={currentBranch}
-                onChange={(e) => { setCurrentBranch(e.target.value) }}
+                onChange={(e) => {
+                  setCurrentBranch(e.target.value);
+                }}
               >
-                {branches.map(b => (
-                  <option key={b} value={b}>{b}</option>
+                {branches.map((b) => (
+                  <option key={b} value={b}>
+                    {b}
+                  </option>
                 ))}
               </select>
               <button
                 onClick={() => {
-                  const name = prompt('New branch name')
+                  const name = prompt("New branch name");
                   if (name) {
-                    fetch('http://localhost:8000/api/branches', {
-                      method: 'POST',
+                    fetch("http://localhost:8000/api/branches", {
+                      method: "POST",
                       headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
                       },
-                      body: JSON.stringify({ document: id, branch: name })
-                    }).then(res => {
+                      body: JSON.stringify({ document: id, branch: name }),
+                    }).then((res) => {
                       if (res.ok) {
-                        fetchBranches()
+                        fetchBranches();
                       }
-                    })
+                    });
                   }
                 }}
-                className="flex items-center gap-1.5 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium tracking-wide border border-slate-300 mt-2">
+                className="flex items-center gap-1.5 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium tracking-wide border border-slate-300 mt-2"
+              >
                 <span className="material-icons-outlined text-lg"></span>
                 <span>New</span>
               </button>
@@ -367,16 +445,27 @@ function Editor({ editable = true }) {
             Commit History
           </h3>
           <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
-            {commits.map(c => (
-              <div key={c.hash} className="flex items-center gap-3 p-3 rounded-md border border-slate-200 hover:bg-slate-50 transition-colors">
+            {commits.map((c) => (
+              <div
+                key={c.hash}
+                className="flex items-center gap-3 p-3 rounded-md border border-slate-200 hover:bg-slate-50 transition-colors"
+              >
                 <div className="flex-shrink-0 size-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-500">
-                  <span className="material-icons-outlined text-xl">history</span>
+                  <span className="material-icons-outlined text-xl">
+                    history
+                  </span>
                 </div>
                 <div className="flex-1">
-                  <p className="text-slate-800 text-sm font-medium line-clamp-1">{c.message}</p>
-                  <p className="text-slate-500 text-xs line-clamp-1">Author: {c.author}</p>
+                  <p className="text-slate-800 text-sm font-medium line-clamp-1">
+                    {c.message}
+                  </p>
+                  <p className="text-slate-500 text-xs line-clamp-1">
+                    Author: {c.author}
+                  </p>
                 </div>
-                <p className="text-slate-500 text-xs shrink-0">{new Date(c.timestamp).toLocaleString()}</p>
+                <p className="text-slate-500 text-xs shrink-0">
+                  {new Date(c.timestamp).toLocaleString()}
+                </p>
               </div>
             ))}
           </div>
@@ -405,11 +494,12 @@ function Editor({ editable = true }) {
             <button
               onClick={() => {
                 saveContent(commitMessage).then(() => {
-                  setCommitMessage('')
-                  fetchHistory()
-                })
+                  setCommitMessage("");
+                  fetchHistory();
+                });
               }}
-              className="flex w-full items-center gap-2 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium tracking-wide shadow-sm transition-colors">
+              className="flex w-full items-center gap-2 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium tracking-wide shadow-sm transition-colors"
+            >
               <span className="material-icons-outlined text-lg"></span>
               <span>Commit Changes</span>
             </button>
@@ -422,24 +512,31 @@ function Editor({ editable = true }) {
           </h3>
           <button
             onClick={() => {
-              const source = prompt(`Merge which branch into ${currentBranch}?`)
+              const source = prompt(
+                `Merge which branch into ${currentBranch}?`
+              );
               if (source) {
-                fetch('http://localhost:8000/api/merge', {
-                  method: 'POST',
+                fetch("http://localhost:8000/api/merge", {
+                  method: "POST",
                   headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
                   },
-                  body: JSON.stringify({ document: id, source, target: currentBranch })
-                }).then(res => {
+                  body: JSON.stringify({
+                    document: id,
+                    source,
+                    target: currentBranch,
+                  }),
+                }).then((res) => {
                   if (res.ok) {
-                    fetchHistory()
-                    fetchBranches()
+                    fetchHistory();
+                    fetchBranches();
                   }
-                })
+                });
               }
             }}
-            className="flex w-full items-center gap-2 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium tracking-wide border border-slate-300">
+            className="flex w-full items-center gap-2 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium tracking-wide border border-slate-300"
+          >
             <span className="material-icons-outlined text-lg"></span>
             <span>Merge Branch</span>
           </button>
@@ -450,14 +547,14 @@ function Editor({ editable = true }) {
         <header className="w-full max-w-4xl flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 bg-transparent px-6 py-3 shadow-sm mb-6 rounded-t-xl">
           <div
             className="flex items-center gap-3 text-white cursor-pointer"
-            onClick={() => navigate('/projects')}
+            onClick={() => navigate("/projects")}
           >
             <div className="inline-flex items-center justify-center bg-white rounded-full p-2">
               <img
                 src={logo}
                 alt="Logo"
                 className="w-20 h-20"
-                style={{ fontFamily: 'Manrope, \"Noto Sans\", sans-serif' }}
+                style={{ fontFamily: 'Manrope, "Noto Sans", sans-serif' }}
               />
             </div>
 
@@ -469,42 +566,32 @@ function Editor({ editable = true }) {
               <button
                 onClick={() => editor && editor.commands.undo()}
                 className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
-              > <img
-                  src={undo}
-                  alt="undo"
-                  className="w-5 h-5"
-                />
+              >
+                {" "}
+                <img src={undo} alt="undo" className="w-5 h-5" />
               </button>
               <button
                 onClick={() => editor && editor.commands.redo()}
                 className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
-              > <img
-                  src={redo}
-                  alt="redo"
-                  className="w-5 h-5"
-                />
+              >
+                {" "}
+                <img src={redo} alt="redo" className="w-5 h-5" />
               </button>
               <button
                 onClick={() => {
-                  saveContent().then(fetchHistory)
+                  saveContent().then(fetchHistory);
                 }}
-                className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"           >
-                <img
-                  src={save}
-                  alt="save"
-                  className="w-5 h-5"
-                />
+                className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
+              >
+                <img src={save} alt="save" className="w-5 h-5" />
               </button>
               <div className="relative">
                 <button
                   ref={shareButtonRef}
                   onClick={() => setShareOpen(true)}
-                  className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"           >
-                  <img
-                    src={share}
-                    alt="share"
-                    className="w-5 h-5"
-                  />
+                  className="flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
+                >
+                  <img src={share} alt="share" className="w-5 h-5" />
                 </button>
                 {shareOpen && (
                   <div
@@ -516,7 +603,7 @@ function Editor({ editable = true }) {
                       value={shareCode}
                       onChange={(e) => setShareCode(e.target.value)}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleJoin()
+                        if (e.key === "Enter") handleJoin();
                       }}
                       placeholder="Código"
                       className="border rounded px-2 py-1 text-sm text-slate-800"
@@ -550,32 +637,40 @@ function Editor({ editable = true }) {
                   onClick={() => handleAction(action)}
                   className={`
         p-2 rounded-md transition-colors
-        ${editor?.isActive(action)
-                      ? 'bg-slate-200'
-                      : 'hover:bg-slate-200'}`}>
+        ${editor?.isActive(action) ? "bg-slate-200" : "hover:bg-slate-200"}`}
+                >
                   <img src={img} alt={alt} className="w-4 h-4" />
                 </button>
               ))}
               {/* Botões de texto */}
               <div className="h-5 w-px bg-slate-300 mx-1"></div>
               <button
-                onClick={() => handleAction('heading2')}
-                className={`p-2 rounded-md ${editor?.isActive('heading', { level: 2 }) ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
-                  } transition-colors`}
+                onClick={() => handleAction("heading2")}
+                className={`p-2 rounded-md ${
+                  editor?.isActive("heading", { level: 2 })
+                    ? "bg-slate-200 text-slate-800"
+                    : "text-slate-600 hover:bg-slate-200 hover:text-slate-800"
+                } transition-colors`}
               >
                 <span className="font-bold">H2</span>
               </button>
               <button
-                onClick={() => handleAction('bulletList')}
-                className={`p-2 rounded-md ${editor?.isActive('bulletList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
-                  } transition-colors`}
+                onClick={() => handleAction("bulletList")}
+                className={`p-2 rounded-md ${
+                  editor?.isActive("bulletList")
+                    ? "bg-slate-200 text-slate-800"
+                    : "text-slate-600 hover:bg-slate-200 hover:text-slate-800"
+                } transition-colors`}
               >
                 <span>&bull;</span>
               </button>
               <button
-                onClick={() => handleAction('orderedList')}
-                className={`p-2 rounded-md ${editor?.isActive('orderedList') ? 'bg-slate-200 text-slate-800' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-800'
-                  } transition-colors`}
+                onClick={() => handleAction("orderedList")}
+                className={`p-2 rounded-md ${
+                  editor?.isActive("orderedList")
+                    ? "bg-slate-200 text-slate-800"
+                    : "text-slate-600 hover:bg-slate-200 hover:text-slate-800"
+                } transition-colors`}
               >
                 <span>1.</span>
               </button>
@@ -587,10 +682,13 @@ function Editor({ editable = true }) {
                     onClick={() => handleAction(action)}
                     className={`
           p-2 rounded-md transition-colors
-          ${editor?.isActive({ textAlign: action.replace('align', '').toLowerCase() })
-                        ? 'bg-slate-200'
-                        : 'hover:bg-slate-200'
-                      } `}
+          ${
+            editor?.isActive({
+              textAlign: action.replace("align", "").toLowerCase(),
+            })
+              ? "bg-slate-200"
+              : "hover:bg-slate-200"
+          } `}
                   >
                     <img src={img} alt={alt} className="w-5 h-5" />
                   </button>
@@ -600,20 +698,20 @@ function Editor({ editable = true }) {
 
             {/* salvamento */}
             <div className="flex items-center gap-2 text-sm">
-              {saveStatus === 'saving' && (
-                <img src={loaderGif} alt="Salvando..." className="w-5 h-5 animate-spin" />
+              {saveStatus === "saving" && (
+                <img
+                  src={loaderGif}
+                  alt="Salvando..."
+                  className="w-5 h-5 animate-spin"
+                />
               )}
-              {saveStatus === 'saved' && (
+              {saveStatus === "saved" && (
                 <>
-                  <img
-                    src={cloudIcon}
-                    alt="Salvo"
-                    className="w-5 h-5"
-                  />
+                  <img src={cloudIcon} alt="Salvo" className="w-5 h-5" />
                   <span className="text-green-400">Salvo</span>
                 </>
               )}
-              {saveStatus === 'error' && (
+              {saveStatus === "error" && (
                 <>
                   <img
                     src={cloudOffIcon}
@@ -623,7 +721,7 @@ function Editor({ editable = true }) {
                   <span className="text-red-400">Erro ao salvar</span>
                 </>
               )}
-              {saveStatus === 'idle' && (
+              {saveStatus === "idle" && (
                 <img
                   src={cloudIcon}
                   alt="Pronto"
@@ -633,18 +731,23 @@ function Editor({ editable = true }) {
             </div>
           </div>
           {/* Título do documento */}
-          <label htmlFor="doc-title" className="mb-1 text-lg font-semibold text-gray-700 select-none">
-            </label>
-            <input
-              id="doc-title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Digite o título do documento"
-              className="mb-6 text-3xl font-bold outline-none border-none w-full px-2 py-1 text-gray-800 placeholder-gray-400 bg-transparent"
-            />
+          <label
+            htmlFor="doc-title"
+            className="mb-1 text-lg font-semibold text-gray-700 select-none"
+          ></label>
+          <input
+            id="doc-title"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Digite o título do documento"
+            className="mb-6 text-3xl font-bold outline-none border-none w-full px-2 py-1 text-gray-800 placeholder-gray-400 bg-transparent"
+          />
           {/* editor de texto */}
-          <EditorContent editor={editor} className="w-full h-full outline-none text-black flex-grow p-10" />
+          <EditorContent
+            editor={editor}
+            className="w-full h-full outline-none text-black flex-grow p-10"
+          />
         </div>
 
         {/* Rodapé */}
@@ -656,4 +759,4 @@ function Editor({ editable = true }) {
   );
 }
 
-      export default Editor
+export default Editor;
