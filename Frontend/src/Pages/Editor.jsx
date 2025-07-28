@@ -66,7 +66,7 @@ function Editor({ editable = true }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const shareRef = useRef(null);
   const shareButtonRef = useRef(null);
-  const { userId, token } = useContext(UserContext);
+  const { userId, token, logout } = useContext(UserContext);
   const [branches, setBranches] = useState([]);
   const [currentBranch, setCurrentBranch] = useState("main");
   const [commitMessage, setCommitMessage] = useState("");
@@ -639,6 +639,12 @@ function Editor({ editable = true }) {
               className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9 border-2 border-white shadow-sm"
               style={avatarStyle}
             ></div>
+            <button
+              onClick={() => { logout(); navigate('/') }}
+              className="ml-2 rounded-lg bg-red-500 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-600"
+            >
+              Logout
+            </button>
           </div>
         </header>
         {/* Editor */}
