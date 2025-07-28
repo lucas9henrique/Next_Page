@@ -111,7 +111,6 @@ function Editor({ editable = true }) {
     BodyNode,
   ];
 
-  // ADICIONADO: Refs para o WebSocket e para controle de atualizações
   const socketRef = useRef(null);
   const isUpdatingFromRemote = useRef(false);
 

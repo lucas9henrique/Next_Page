@@ -331,8 +331,7 @@ def load_document(
             content = f.read()
 
     # aqui pegamos o título do projeto vindo do MongoDB
-    # supondo que o campo se chame "nomeProjeto"
-    title = proj.get("nomeProjeto", "Título do Documento")
+    title = proj.get("nomeProjeto")
 
     # retornamos ambos
     return {
