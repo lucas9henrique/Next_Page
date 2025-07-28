@@ -30,3 +30,4 @@ dist-ssr
 Backend/.env
 /Backend/__pycache__
 /Backend/repos
+/Backend/venv
