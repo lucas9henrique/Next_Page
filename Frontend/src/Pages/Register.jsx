@@ -48,7 +48,7 @@ function Register() {
             >
               <img src={logo} alt="Logo" className="w-20 h-20" />
               <h1 className="text-3xl font-bold tracking-tight">Next_Page</h1>
-            </Link>
+            </div>
             <p className="text-slate-600">Create your account.</p>
           </div>
           <form className="space-y-6" onSubmit={handleSubmit}>

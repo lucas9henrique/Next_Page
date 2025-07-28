@@ -62,7 +62,6 @@ function Editor({ editable = true }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const shareRef = useRef(null)
   const shareButtonRef = useRef(null)
-  const [title, setTitle] = useState('Título do Documento')
   const { userId, token } = useContext(UserContext)
   const [branches, setBranches] = useState([])
   const [currentBranch, setCurrentBranch] = useState('main')
@@ -463,7 +462,7 @@ function Editor({ editable = true }) {
             </div>
 
             <h1 className="text-2xl font-bold tracking-tight">Next_Page</h1>
-          </Link>
+          </div>
           <div className="flex flex-1 items-center justify-end gap-6 relative">
             {/* Botões de ação */}
             <div className="flex items-center gap-2">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react'
 import { UserContext } from './UserContext.jsx'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate} from 'react-router-dom'
 import logo from '../assets/logo1.png'
 
 export default function Projects() {
@@ -89,7 +89,7 @@ export default function Projects() {
               className="w-12 h-12 rounded-full bg-white p-1"
             />
             <span className="text-2xl font-bold">Next_Page</span>
-          </Link>
+          </div>
           <div className="flex items-center gap-4 relative">
             <input
               type="text"
