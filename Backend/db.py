@@ -24,7 +24,7 @@ class Project(BaseModel):
     permissions: List[str] = Field(default_factory=list)
     Texto: str = ""
     branch: str = "main"
-    branches: List[Dict] = Field(default_factory=list)
+    branches: List[str] = Field(default_factory=lambda: ["main"])
 
 class MongoDB:
     def __init__(self):
@@ -73,6 +73,15 @@ class MongoDB:
 
     def remove_permission(self, codigo: str, user: str) -> None:
         self.projects.update_one({"codigo": codigo}, {"$pull": {"permissions": user}})
+
+        # NOVO: Método para adicionar uma branch ao MongoDB
+    def add_branch(self, codigo: str, branch_name: str) -> None:
+        self.projects.update_one({"codigo": codigo}, {"$addToSet": {"branches": branch_name}})
+
+    # NOVO: Método para remover uma branch do MongoDB
+    def remove_branch(self, codigo: str, branch_name: str) -> None:
+        self.projects.update_one({"codigo": codigo}, {"$pull": {"branches": branch_name}})
+
 
     def update_project(self, codigo: str, data: dict) -> int:
         data["ultimaModificacao"] = datetime.utcnow()
