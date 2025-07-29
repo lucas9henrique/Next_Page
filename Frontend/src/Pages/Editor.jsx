@@ -467,7 +467,6 @@ function Editor({ editable = true }) {
               >
                 <div className="flex-shrink-0 size-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-500">
                   <span className="material-icons-outlined text-xl">
-                    history
                   </span>
                 </div>
                 <div className="flex-1">
@@ -485,42 +484,6 @@ function Editor({ editable = true }) {
             ))}
           </div>
         </section>
-
-        <section>
-          <h3 className="text-slate-800 text-lg font-semibold pb-3 border-b border-slate-200 mb-3">
-            Commit Changes
-          </h3>
-          <div className="space-y-3">
-            <div>
-              <label
-                className="block text-slate-700 text-sm font-medium pb-1.5"
-                htmlFor="commit-message"
-              >
-                Commit Message
-              </label>
-              <input
-                className="form-input w-full rounded-md text-slate-800 focus:outline-0 focus:ring-2 focus:ring-blue-500 border border-slate-300 bg-slate-50 focus:border-blue-500 h-11 placeholder:text-slate-400 px-3 text-sm"
-                id="commit-message"
-                placeholder="Enter your commit message"
-                value={commitMessage}
-                onChange={(e) => setCommitMessage(e.target.value)}
-              />
-            </div>
-            <button
-              onClick={() => {
-                saveContent(commitMessage).then(() => {
-                  setCommitMessage("");
-                  fetchHistory();
-                });
-              }}
-              className="flex w-full items-center gap-2 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-md h-11 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium tracking-wide shadow-sm transition-colors"
-            >
-              <span className="material-icons-outlined text-lg"></span>
-              <span>Commit Changes</span>
-            </button>
-          </div>
-        </section>
-
         <section>
           <h3 className="text-slate-800 text-lg font-semibold pb-3 border-b border-slate-200 mb-3">
             Merge Branches
