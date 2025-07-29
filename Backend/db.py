@@ -6,15 +6,25 @@ import os
 import uuid
 from datetime import datetime
 from typing import List, Optional, Dict
+import certifi
 
 from pydantic import BaseModel, Field
 from pymongo import MongoClient, ReturnDocument
+from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.results import InsertOneResult, UpdateResult
 
 # não precisa de fallback com senha hard‑code!
-MONGO_URL = os.getenv("MONGO_URL")
+
 MONGO_DB  = os.getenv("MONGO_DB", "next_page")
+MONGO_URL = os.getenv("MONGODB_URL") 
+
+client = MongoClient(
+    MONGO_URL,
+    tls=True,                         # força uso de TLS
+    tlsAllowInvalidCertificates=False,
+    tlsCAFile=certifi.where()        # aponta para o bundle de CAs do certifi
+)
 
 class Project(BaseModel):
     nomeProjeto: str
