@@ -25,7 +25,7 @@ export function UserProvider ({ children }) {
   }, [])
 
   const login = async (email, password) => {
-    const resp = await fetch('http://localhost:8000/api/login', {
+    const resp = await fetch('https://next-page-backend.onrender.com/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })

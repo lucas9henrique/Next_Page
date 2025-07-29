@@ -179,7 +179,7 @@
         menu.classList.toggle('hidden');
       }
       function createDoc() {
-        fetch('http://localhost:8000/documents', {
+        fetch('https://next-page-backend.onrender.com/documents', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title: 'Untitled' })
