@@ -136,7 +136,7 @@ function Editor({ editable = true }) {
   });
 
   const fetchBranches = useCallback(() => {
-    fetch(`http://localhost:8000/api/branches/${id}`, {
+    fetch(`https://next-page-backend.onrender.com/api/branches/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => (res.ok ? res.json() : []))
@@ -154,7 +154,7 @@ function Editor({ editable = true }) {
   }, [id, token, currentBranch]);
 
   const fetchHistory = useCallback(() => {
-    fetch(`http://localhost:8000/api/history/${id}?branch=${currentBranch}`, {
+    fetch(`https://next-page-backend.onrender.com/api/history/${id}?branch=${currentBranch}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => (res.ok ? res.json() : []))
@@ -173,7 +173,7 @@ function Editor({ editable = true }) {
   // Load initial document content and title
   useEffect(() => {
     if (!id || !token || !editor) return;
-    fetch(`http://localhost:8000/api/load/${id}?branch=${currentBranch}`, {
+    fetch(`https://next-page-backend.onrender.com/api/load/${id}?branch=${currentBranch}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => (res.ok ? res.json() : null))
@@ -194,7 +194,7 @@ function Editor({ editable = true }) {
       const currentContent = editor.getHTML(); // Pega o HTML mais recente
 
       setSaveStatus("saving");
-      return fetch(`http://localhost:8000/api/save/${id}`, {
+      return fetch(`https://next-page-backend.onrender.com/api/save/${id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -225,7 +225,7 @@ function Editor({ editable = true }) {
       return;
     }
 
-    const wsUrl = `ws://localhost:8000/ws/${id}?token=${token}`;
+    const wsUrl = `wss://next-page-backend.onrender.com/ws/${id}?token=${token}`;
     const ws = new WebSocket(wsUrl);
     socketRef.current = ws;
 
@@ -322,7 +322,7 @@ function Editor({ editable = true }) {
   const handleJoin = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8000/api/documents/${id}/add_user`,
+        `https://next-page-backend.onrender.com/api/documents/${id}/add_user`,
         {
           method: "POST",
           headers: {
@@ -432,7 +432,7 @@ function Editor({ editable = true }) {
                 onClick={() => {
                   const name = prompt("New branch name");
                   if (name) {
-                    fetch("http://localhost:8000/api/branches", {
+                    fetch("https://next-page-backend.onrender.com/api/branches", {
                       method: "POST",
                       headers: {
                         "Content-Type": "application/json",
@@ -494,7 +494,7 @@ function Editor({ editable = true }) {
                 `Merge which branch into ${currentBranch}?`
               );
               if (source) {
-                fetch("http://localhost:8000/api/merge", {
+                fetch("https://next-page-backend.onrender.com/api/merge", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",

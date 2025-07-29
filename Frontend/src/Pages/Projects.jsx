@@ -17,7 +17,7 @@ export default function Projects() {
   useEffect(() => {
     if (!userId) return
     setIsLoading(true)
-    fetch(`http://localhost:8000/api/documents`, {
+    fetch(`https://next-page-backend.onrender.com/api/documents`, {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
@@ -47,7 +47,7 @@ export default function Projects() {
   }, [menuOpen])
 
   const handleCreate = () => {
-    fetch('http://localhost:8000/api/documents', {
+    fetch('https://next-page-backend.onrender.com/api/documents', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json',
                  'Authorization': `Bearer ${token}`},
@@ -63,7 +63,7 @@ export default function Projects() {
 
   const handleDelete = codigo => {
     if (!window.confirm('Are you sure you want to delete this project?')) return
-    fetch(`http://localhost:8000/api/documents/${codigo}`, {
+    fetch(`https://next-page-backend.onrender.com/api/documents/${codigo}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
