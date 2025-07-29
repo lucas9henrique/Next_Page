@@ -17,7 +17,7 @@ from pymongo.results import InsertOneResult, UpdateResult
 # não precisa de fallback com senha hard‑code!
 
 MONGO_DB  = os.getenv("MONGO_DB", "next_page")
-MONGO_URL = os.getenv("MONGODB_URL") 
+MONGO_URL = os.getenv("MONGO_URL") 
 
 client = MongoClient(
     MONGO_URL,
